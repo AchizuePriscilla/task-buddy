@@ -10,7 +10,10 @@ class SharedPrefsService implements LocalStorageService {
 
   @override
   void init() {
-    initCompleter.complete(SharedPreferences.getInstance());
+      SharedPreferences.getInstance().then((prefs) {
+      sharedPreferences = prefs;
+      initCompleter.complete(prefs);
+    });
   }
 
   @override
