@@ -2,8 +2,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
+import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
-import 'package:task_buddy/features/task_management/domain/priority_enum.dart';
+import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/task_card.dart';
 import 'package:task_buddy/shared/theme/app_theme.dart';
 
@@ -14,7 +16,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final random = Random();
     final priorities = Priority.values;
-
+    final categories = CategoryEnum.values;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -39,15 +41,18 @@ class HomeScreen extends ConsumerWidget {
         itemCount: 100,
         itemBuilder: (context, index) {
           final randomPriority = priorities[random.nextInt(priorities.length)];
+          final randomCategory = categories[random.nextInt(categories.length)];
           final randomCompleted = random.nextBool();
 
           return TaskCard(
-            title: 'Task $index',
-            description: 'Description $index',
-            category: 'Category $index',
-            dueDate: 'Due Date $index',
-            priority: randomPriority,
-            isCompleted: randomCompleted,
+            task: TaskModel(
+              title: 'Task $index',
+              description: 'Description $index',
+              category: randomCategory,
+              dueDate: DateTime.now().add(Duration(days: index)),
+              priority: randomPriority,
+              isCompleted: randomCompleted,
+            ),
           );
         },
       ),

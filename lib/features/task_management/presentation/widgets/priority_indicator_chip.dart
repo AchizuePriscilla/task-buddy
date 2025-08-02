@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:task_buddy/features/task_management/domain/priority_enum.dart';
+import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
 
 class PriorityIndicatorChip extends StatelessWidget {
   const PriorityIndicatorChip({

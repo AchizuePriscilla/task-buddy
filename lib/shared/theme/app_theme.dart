@@ -40,12 +40,13 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.dark,
       fontFamily: AppTextStyles.fontFamily,
-      primaryColor: AppColors.primary,
+      primaryColor: AppColors.white,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
-        secondary: AppColors.lightGrey,
+        primary: AppColors.white,
+        secondary: AppColors.extraLightGrey,
         error: AppColors.error,
         surface: AppColors.black,
+        onPrimary: AppColors.black,
       ),
       cardColor: AppColors.grey,
       scaffoldBackgroundColor: AppColors.black,
@@ -63,10 +64,12 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.light,
       fontFamily: AppTextStyles.fontFamily,
+      primaryColor: AppColors.black,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.primary,
-        secondary: AppColors.grey,
+        primary: AppColors.black,
+        secondary: AppColors.extraLightGrey,
         error: AppColors.error,
+        onPrimary: AppColors.white,
         // surface: AppColors.white,
       ),
       textTheme: TextThemes.textTheme,
