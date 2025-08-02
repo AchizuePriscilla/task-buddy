@@ -44,6 +44,12 @@ class _TaskCardState extends State<TaskCard> {
           stops: [0.11, 0.11],
         ),
         borderRadius: BorderRadius.circular(10.r),
+        border: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : Border.all(
+                color: cardColor,
+                width: .5,
+              ),
       ),
       margin: EdgeInsets.symmetric(
         horizontal: 10.w,
@@ -57,7 +63,7 @@ class _TaskCardState extends State<TaskCard> {
             padding: EdgeInsets.only(top: 8.h, left: 5.w),
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor.withValues(alpha: 0.25),
+                color: Theme.of(context).cardColor.withValues(alpha: 0.3),
               ),
               width: 35.w,
               height: 35.w,
@@ -166,6 +172,7 @@ class _TaskCardState extends State<TaskCard> {
                                   text: widget.dueDate,
                                   style: AppTextStyles.body.copyWith(
                                     color: widget.priority.color,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],

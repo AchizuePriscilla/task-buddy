@@ -1,18 +1,40 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/features/task_management/domain/priority_enum.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/task_card.dart';
+import 'package:task_buddy/shared/theme/app_theme.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final random = Random();
     final priorities = Priority.values;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(AppStrings.appName),
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        actions: [
+          InkWell(
+            onTap: () {
+              ref.read(appThemeProvider.notifier).toggleTheme();
+            },
+            child: Icon(
+              Theme.of(context).brightness == Brightness.dark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+            ),
+          ),
+          SizedBox(width: 10.w),
+        ],
+      ),
       body: ListView.builder(
         itemCount: 100,
         itemBuilder: (context, index) {

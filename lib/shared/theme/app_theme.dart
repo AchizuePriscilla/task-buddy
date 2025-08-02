@@ -48,7 +48,6 @@ class AppTheme {
         surface: AppColors.black,
       ),
       cardColor: AppColors.grey,
-      // backgroundColor: AppColors.black,
       scaffoldBackgroundColor: AppColors.black,
       textTheme: TextThemes.darkTextTheme,
       primaryTextTheme: TextThemes.primaryTextTheme,
@@ -56,6 +55,30 @@ class AppTheme {
         elevation: 0,
         backgroundColor: AppColors.black,
         titleTextStyle: AppTextStyles.h2,
+      ),
+    );
+  }
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      brightness: Brightness.light,
+      fontFamily: AppTextStyles.fontFamily,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.primary,
+        secondary: AppColors.grey,
+        error: AppColors.error,
+        // surface: AppColors.white,
+      ),
+      textTheme: TextThemes.textTheme,
+      primaryTextTheme: TextThemes.primaryTextTheme,
+      cardColor: AppColors.extraLightGrey,
+      scaffoldBackgroundColor: AppColors.white,
+      appBarTheme: AppBarTheme(
+        elevation: 0,
+        backgroundColor: AppColors.white,
+        titleTextStyle: AppTextStyles.h2.copyWith(
+          color: AppColors.black,
+        ),
       ),
     );
   }
