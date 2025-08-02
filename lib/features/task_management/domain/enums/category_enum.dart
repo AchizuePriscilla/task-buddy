@@ -1,12 +1,23 @@
+import 'package:hive/hive.dart';
 import '../../../../shared/localization/strings.dart';
 
+part 'category_enum.g.dart';
+
+@HiveType(typeId: 2)
 enum CategoryEnum {
+  @HiveField(0)
   work,
+  @HiveField(1)
   personal,
+  @HiveField(2)
   study,
+  @HiveField(3)
   home,
+  @HiveField(4)
   health,
+  @HiveField(5)
   finance,
+  @HiveField(6)
   other,
 }
 

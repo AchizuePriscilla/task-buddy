@@ -42,7 +42,7 @@ class HomeScreen extends ConsumerWidget {
         onPressed: () {
           Navigator.push(
             context,
-              MaterialPageRoute(builder: (context) => CreateTaskScreen()),
+            MaterialPageRoute(builder: (context) => CreateTaskScreen()),
           );
         },
         child: Icon(Icons.add),
@@ -56,6 +56,7 @@ class HomeScreen extends ConsumerWidget {
 
           return TaskCard(
             task: TaskModel(
+              id: 'task_$index',
               title: 'Task $index',
               description: 'Description $index',
               category: randomCategory,
