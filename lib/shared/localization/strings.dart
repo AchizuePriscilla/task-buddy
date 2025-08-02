@@ -12,6 +12,8 @@ class AppStrings {
 
   // Task strings
   static const String editTask = 'Edit Task';
+  static const String createTask = 'Create Task';
+  static const String create = 'Create';
   static const String cancel = 'Cancel';
   static const String save = 'Save';
   static const String title = 'Title';
@@ -20,7 +22,7 @@ class AppStrings {
   static const String descriptionHint = 'Enter task description';
   static const String priority = 'Priority';
   static const String category = 'Category';
-  static const String setDueDate = 'Set Due Date (Optional)';
+  static const String setDueDate = 'Set Due Date';
   static const String dueWithColon = 'Due:';
   static const String done = 'Done';
 

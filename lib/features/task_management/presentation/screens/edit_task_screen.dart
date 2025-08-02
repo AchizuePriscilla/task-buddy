@@ -6,6 +6,7 @@ import 'package:task_buddy/features/task_management/domain/extensions/datetime_e
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/button.dart';
+import 'package:task_buddy/features/task_management/presentation/widgets/due_date_rich_text.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/custom_text_field.dart';
 import 'package:task_buddy/shared/theme/text_styles.dart';
 
@@ -28,6 +29,7 @@ class EditTaskScreen extends StatelessWidget {
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 16.h),
               CustomTextField(
@@ -74,40 +76,22 @@ class EditTaskScreen extends StatelessWidget {
               ),
               SizedBox(height: 16.h),
               //Date Picker
-              GestureDetector(
+              DueDateRichText(
+                iconSize: 22.sp,
+                text:
+                    '${AppStrings.dueWithColon} ${task.dueDate.formattedDueDate} ${task.isCompleted ? '(${AppStrings.done}✅) ' : ''}',
+                color: task.isCompleted ? null : task.priority.color,
+                showIcon: true,
                 onTap: () async {
                   final date = await showDatePicker(
                     context: context,
-                    initialDate: task.dueDate ?? DateTime.now(),
+                    initialDate: task.dueDate,
                     firstDate: DateTime.now(),
                     lastDate:
                         DateTime.now().add(const Duration(days: 365 * 50)),
                   );
                   if (date != null) {}
                 },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.schedule,
-                      color: task.isCompleted ? null : task.priority.color,
-                      size: 22.sp,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      task.dueDate != null
-                          ? '${AppStrings.dueWithColon} ${task.dueDate!.formattedDueDate} ${task.isCompleted ? '(${AppStrings.done}✅) ' : ''}'
-                          : AppStrings.setDueDate,
-                      style: AppTextStyles.bodyLarge.copyWith(
-                          color: task.isCompleted ? null : task.priority.color),
-                    ),
-                    const Spacer(),
-                    if (task.dueDate != null)
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.clear),
-                      )
-                  ],
-                ),
               ),
               SizedBox(height: 16.h),
               //Button Row

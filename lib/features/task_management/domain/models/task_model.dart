@@ -5,7 +5,7 @@ class TaskModel {
   final String title;
   final String? description;
   final CategoryEnum category;
-  final DateTime? dueDate;
+  final DateTime dueDate;
   final Priority priority;
   final bool isCompleted;
 

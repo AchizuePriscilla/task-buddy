@@ -5,6 +5,7 @@ import 'package:task_buddy/features/task_management/domain/extensions/datetime_e
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
 import 'package:task_buddy/features/task_management/presentation/screens/edit_task_screen.dart';
+import 'package:task_buddy/features/task_management/presentation/widgets/due_date_rich_text.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/priority_indicator_chip.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/shared/theme/text_styles.dart';
@@ -159,33 +160,12 @@ class _TaskCardState extends State<TaskCard> {
                               ),
                             ),
                             const Spacer(),
-                            if (!widget.task.isCompleted &&
-                                widget.task.dueDate != null)
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    WidgetSpan(
-                                      alignment: PlaceholderAlignment.middle,
-                                      child: Icon(
-                                        Icons.schedule,
-                                        size: 16.sp,
-                                        color: widget.task.priority.color,
-                                      ),
-                                    ),
-                                    WidgetSpan(
-                                        child: SizedBox(
-                                            width: 3
-                                                .w)), // spacing between icon and text
-                                    TextSpan(
-                                      text:
-                                          '${AppStrings.dueWithColon} ${widget.task.dueDate!.formattedDueDate}',
-                                      style: AppTextStyles.body.copyWith(
-                                        color: widget.task.priority.color,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            if (!widget.task.isCompleted)
+                              DueDateRichText(
+                                iconSize: 16.sp,
+                                color: widget.task.priority.color,
+                                text:
+                                    '${AppStrings.dueWithColon} ${widget.task.dueDate.formattedDueDate}',
                               ),
                           ],
                         )

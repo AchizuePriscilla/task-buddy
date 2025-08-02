@@ -6,6 +6,7 @@ import 'package:task_buddy/features/task_management/domain/enums/category_enum.d
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
+import 'package:task_buddy/features/task_management/presentation/screens/create_task_screen.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/task_card.dart';
 import 'package:task_buddy/shared/theme/app_theme.dart';
 
@@ -36,6 +37,15 @@ class HomeScreen extends ConsumerWidget {
           ),
           SizedBox(width: 10.w),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+              MaterialPageRoute(builder: (context) => CreateTaskScreen()),
+          );
+        },
+        child: Icon(Icons.add),
       ),
       body: ListView.builder(
         itemCount: 100,

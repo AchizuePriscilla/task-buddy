@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:task_buddy/features/task_management/presentation/screens/home_screen.dart';
+import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/shared/theme/app_theme.dart';
 
 void main() async {
@@ -21,7 +22,8 @@ class MyApp extends ConsumerWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
-          title: 'Task Buddy',
+          title: AppStrings.appName,
+          debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
