@@ -11,11 +11,14 @@ class ConflictResolver {
     } else if (remoteTask.updatedAt.isAfter(localTask.updatedAt)) {
       return remoteTask; // Remote is more recent
     } else {
-      // Same timestamp, compare creation time as tiebreaker
+      // Same updatedAt timestamp, compare creation time as tiebreaker
       if (localTask.createdAt.isAfter(remoteTask.createdAt)) {
-        return localTask;
+        return localTask; // Local was created later
+      } else if (remoteTask.createdAt.isAfter(localTask.createdAt)) {
+        return remoteTask; // Remote was created later
       } else {
-        return remoteTask;
+        // Same creation time too, default to local as the source of truth
+        return localTask;
       }
     }
   }
@@ -72,14 +75,20 @@ class ConflictResolver {
     final remoteTaskIds = remoteTasks.map((task) => task.id).toSet();
 
     return localTasks.where((localTask) {
+      // If task doesn't exist on remote, it needs to be synced
+      if (!remoteTaskIds.contains(localTask.id)) {
+        return true;
+      }
+
+      // Find the corresponding remote task
       final remoteTask = remoteTasks.firstWhere(
         (task) => task.id == localTask.id,
-        orElse: () => localTask, // Dummy task for comparison
+        orElse: () =>
+            localTask, // This should never be reached due to the check above
       );
 
-      // Include if task doesn't exist on remote or has conflicts
-      return !remoteTaskIds.contains(localTask.id) ||
-          hasConflict(localTask, remoteTask);
+      // Include if there are conflicts
+      return hasConflict(localTask, remoteTask);
     }).toList();
   }
 }
