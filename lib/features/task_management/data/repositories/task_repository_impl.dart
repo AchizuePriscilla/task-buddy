@@ -1,6 +1,6 @@
+import 'package:task_buddy/features/task_management/data/datasources/task_local_datasource.dart';
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/domain/repositories/task_repository.dart';
-import 'package:task_buddy/features/task_management/data/datasources/task_datasource.dart';
 import 'package:task_buddy/features/task_management/domain/services/task_sync_service.dart';
 import 'package:task_buddy/shared/data/sync/sync_queue.dart';
 import 'package:task_buddy/shared/domain/exceptions/database_exception.dart';
@@ -8,7 +8,7 @@ import 'package:task_buddy/shared/domain/exceptions/task_repository_exception.da
 
 /// Repository implementation for local database
 class TaskRepositoryImpl implements TaskRepository {
-  final TaskDataSource _localDataSource;
+  final TaskLocalDataSource _localDataSource;
   final TaskSyncService _syncService;
 
   const TaskRepositoryImpl(
