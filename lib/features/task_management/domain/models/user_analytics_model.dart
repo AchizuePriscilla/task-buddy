@@ -1,10 +1,11 @@
 import 'package:hive/hive.dart';
+import 'package:equatable/equatable.dart';
 import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
 
 part 'user_analytics_model.g.dart';
 
 @HiveType(typeId: 3)
-class UserAnalyticsModel extends HiveObject {
+class UserAnalyticsModel extends Equatable {
   @HiveField(0)
   final String id;
 
@@ -93,13 +94,15 @@ class UserAnalyticsModel extends HiveObject {
   }
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is UserAnalyticsModel && other.id == id;
-  }
-
-  @override
-  int get hashCode => id.hashCode;
+  List<Object?> get props => [
+        id,
+        category,
+        totalTasksCreated,
+        totalTasksCompleted,
+        tasksCompletedOnTime,
+        tasksCompletedLate,
+        lastUpdated,
+      ];
 
   @override
   String toString() {
