@@ -31,15 +31,28 @@ class _TaskCardState extends ConsumerState<TaskCard> {
     cardColor = widget.task.isCompleted
         ? Theme.of(context).cardColor
         : widget.task.priority.color;
-    return GestureDetector(
+
+    return Dismissible(
+      key: Key(widget.task.id),
+      direction: DismissDirection.endToStart, // Swipe left to delete
+      confirmDismiss: (direction) async {
+        final shouldDelete = await _showDeleteConfirmation();
+        if (shouldDelete) {
+          _deleteTask();
+        }
+        return shouldDelete;
+      },
+      background: _buildDeleteBackground(),
+      child: GestureDetector(
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditTaskScreen(
-                  task: widget.task,
-                ),
-              ));
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditTaskScreen(
+                task: widget.task,
+              ),
+            ),
+          );
         },
         child: Container(
           decoration: BoxDecoration(
@@ -188,7 +201,69 @@ class _TaskCardState extends ConsumerState<TaskCard> {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
+  }
+
+  /// Builds the background that appears when swiping to delete
+  Widget _buildDeleteBackground() {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10.h),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.error,
+        borderRadius: BorderRadius.circular(10.r),
+      ),
+      alignment: Alignment.centerRight,
+      padding: EdgeInsets.only(right: 20.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Icon(
+            Icons.delete,
+            color: Theme.of(context).colorScheme.onError,
+            size: 24.sp,
+          ),
+          SizedBox(width: 8.w),
+          Text(
+            AppStrings.delete,
+            style: AppTextStyles.bodyLarge.copyWith(
+              color: Theme.of(context).colorScheme.onError,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Shows a confirmation dialog before deleting the task
+  Future<bool> _showDeleteConfirmation() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(AppStrings.deleteTask),
+              content: Text(
+                '${AppStrings.deleteTaskConfirmation} "${widget.task.title}"?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(AppStrings.cancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  child: Text(AppStrings.delete),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 
   void _toggleTaskCompletion() {
@@ -198,5 +273,10 @@ class _TaskCardState extends ConsumerState<TaskCard> {
     );
 
     ref.read(taskStateProvider.notifier).updateTask(updatedTask);
+  }
+
+  /// Deletes the task
+  void _deleteTask() {
+    ref.read(taskStateProvider.notifier).deleteTask(widget.task);
   }
 }

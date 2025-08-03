@@ -74,7 +74,8 @@ class AppStrings {
   static const String pendingWithColon = 'Pending:';
   static const String errorWithColon = 'Error:';
   static const String noTasksMatchFilters = 'No tasks match your filters';
-  static const String noTasksFound = 'No tasks found. Create your first task!';
+  static const String youHaveNoTasksYet =
+      'You have no tasks yet, click the + button to create your first task!';
   static const String progressIndicatorTooltip = 'of tasks completed';
 
   // Error messages
@@ -97,4 +98,10 @@ class AppStrings {
   static const String taskUpdatedSuccess = 'Task updated successfully!';
   static const String taskUpdateFailed = 'Failed to update task:';
   static const String markAsCompleted = 'Mark as completed';
+
+  // Delete strings
+  static const String delete = 'Delete';
+  static const String deleteTask = 'Delete Task';
+  static const String deleteTaskConfirmation =
+      'Are you sure you want to delete';
 }

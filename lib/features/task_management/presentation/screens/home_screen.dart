@@ -253,18 +253,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     : filteredTasks.isEmpty
                         ? Center(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
+                                SizedBox(height: 40.h),
                                 Icon(
                                   Icons.task_alt,
                                   size: 64,
                                   color: Theme.of(context).disabledColor,
                                 ),
-                                SizedBox(height: 8.h),
+                                SizedBox(height: 20.h),
                                 Text(
                                   hasActiveFilters
                                       ? AppStrings.noTasksMatchFilters
-                                      : AppStrings.noTasksFound,
+                                      : AppStrings.youHaveNoTasksYet,
                                   style: AppTextStyles.h4,
                                   textAlign: TextAlign.center,
                                 ),
