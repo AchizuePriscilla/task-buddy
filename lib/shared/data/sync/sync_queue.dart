@@ -121,10 +121,15 @@ class SyncQueue {
     _isProcessing = true;
 
     try {
-      for (final operation in _operations) {
+      // Create a copy of the operations list to avoid concurrent modification
+      final operationsToProcess = List<SyncOperation>.from(_operations);
+      final operationsToRemove = <SyncOperation>[];
+      final operationsToUpdate = <SyncOperation>[];
+
+      for (final operation in operationsToProcess) {
         try {
           await syncFunction(operation);
-          _operations.remove(operation);
+          operationsToRemove.add(operation);
         } catch (e) {
           debugPrint('Sync operation failed: ${operation.id}, error: $e');
 
@@ -135,16 +140,26 @@ class SyncQueue {
 
           if (updatedOperation.retryCount >= _maxRetries) {
             // Remove operation after max retries
-            _operations.remove(operation);
+            operationsToRemove.add(operation);
             debugPrint(
                 'Sync operation failed after $_maxRetries retries: ${operation.id}');
           } else {
             // Update operation with new retry count
-            final index = _operations.indexOf(operation);
-            if (index != -1) {
-              _operations[index] = updatedOperation;
-            }
+            operationsToUpdate.add(updatedOperation);
           }
+        }
+      }
+
+      // Apply all changes after processing
+      for (final operation in operationsToRemove) {
+        _operations.remove(operation);
+      }
+
+      for (final updatedOperation in operationsToUpdate) {
+        final index =
+            _operations.indexWhere((op) => op.id == updatedOperation.id);
+        if (index != -1) {
+          _operations[index] = updatedOperation;
         }
       }
 
