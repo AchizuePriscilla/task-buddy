@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
@@ -44,7 +45,7 @@ class SmartPriorityService {
       }
     } catch (e) {
       // Log error but don't throw - smart priority should not break main functionality
-      print('Smart priority recalculation failed: $e');
+      debugPrint('Smart priority recalculation failed: $e');
     }
   }
 

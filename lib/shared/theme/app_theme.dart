@@ -7,6 +7,7 @@ import 'package:task_buddy/shared/theme/app_colors.dart';
 import 'package:task_buddy/shared/theme/text_styles.dart';
 import 'package:task_buddy/shared/theme/text_theme.dart';
 
+// Provider for the theme state
 final appThemeProvider = StateNotifierProvider<AppThemeModeNotifier, ThemeMode>(
   (ref) {
     final storage = ref.watch(localStorageServiceProvider);
@@ -17,21 +18,22 @@ final appThemeProvider = StateNotifierProvider<AppThemeModeNotifier, ThemeMode>(
 class AppThemeModeNotifier extends StateNotifier<ThemeMode> {
   final LocalStorageService storageService;
 
-  ThemeMode currentTheme = ThemeMode.dark;
-
-  AppThemeModeNotifier(this.storageService) : super(ThemeMode.dark) {
-    getCurrentTheme();
-  }
+  AppThemeModeNotifier(this.storageService, {ThemeMode? initialTheme})
+      : super(initialTheme ?? ThemeMode.dark);
 
   void toggleTheme() {
     state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     storageService.set(AppGlobals.appThemeStorageKey, state.name);
   }
 
-  void getCurrentTheme() async {
-    final theme = await storageService.get(AppGlobals.appThemeStorageKey);
-    final value = ThemeMode.values.byName('${theme ?? 'dark'}');
-    state = value;
+  void setTheme(ThemeMode themeMode) {
+    state = themeMode;
+    storageService.set(AppGlobals.appThemeStorageKey, themeMode.name);
+  }
+
+  // Method to set initial theme from main function
+  void setInitialTheme(ThemeMode themeMode) {
+    state = themeMode;
   }
 }
 
