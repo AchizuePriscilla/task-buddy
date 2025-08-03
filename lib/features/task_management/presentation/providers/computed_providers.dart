@@ -48,3 +48,14 @@ final hasActiveFiltersProvider = Provider<bool>((ref) {
   final filterState = ref.watch(filterStateProvider);
   return filterState.hasActiveFilters;
 });
+
+/// Computed provider for task completion percentage
+final taskCompletionPercentageProvider = Provider<double>((ref) {
+  final taskState = ref.watch(taskStateProvider);
+  final tasks = taskState.tasks;
+
+  if (tasks.isEmpty) return 0.0;
+
+  final completedTasks = tasks.where((task) => task.isCompleted).length;
+  return (completedTasks / tasks.length) * 100;
+});

@@ -54,6 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final filteredTasks = ref.watch(filteredTasksProvider);
     final taskCounts = ref.watch(taskCountsProvider);
     final hasActiveFilters = ref.watch(hasActiveFiltersProvider);
+    final completionPercentage = ref.watch(taskCompletionPercentageProvider);
     final taskNotifier = ref.read(taskStateProvider.notifier);
     final filterNotifier = ref.read(filterStateProvider.notifier);
 
@@ -64,6 +65,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         scrolledUnderElevation: 0,
         centerTitle: true,
         actions: [
+          // Progress indicator
+          Tooltip(
+            message:
+                '${completionPercentage.toInt()}% ${AppStrings.progressIndicatorTooltip}',
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 32.w,
+                  height: 32.h,
+                  child: CircularProgressIndicator(
+                    value: completionPercentage / 100,
+                    strokeWidth: 3,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainerLowest,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      completionPercentage >= 100
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${completionPercentage.toInt()}%',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 15.w),
           // Theme toggle
           InkWell(
             onTap: () {
@@ -73,9 +107,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Theme.of(context).brightness == Brightness.dark
                   ? Icons.light_mode
                   : Icons.dark_mode,
+              size: 28.sp,
             ),
           ),
-          SizedBox(width: 15.w),
+          SizedBox(width: 20.w),
         ],
       ),
       floatingActionButton: FloatingActionButton(

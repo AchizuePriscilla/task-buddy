@@ -75,6 +75,7 @@ class AppStrings {
   static const String errorWithColon = 'Error:';
   static const String noTasksMatchFilters = 'No tasks match your filters';
   static const String noTasksFound = 'No tasks found. Create your first task!';
+  static const String progressIndicatorTooltip = 'of tasks completed';
 
   // Error messages
   static const String failedToLoadTasks = 'Failed to load tasks:';
