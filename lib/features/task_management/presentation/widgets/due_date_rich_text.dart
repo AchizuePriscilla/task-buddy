@@ -11,6 +11,7 @@ class DueDateRichText extends StatelessWidget {
     this.color,
     this.showIcon = false,
     this.onTap,
+    this.onClearIconTap,
   });
   final double iconSize;
   final String text;
@@ -18,13 +19,16 @@ class DueDateRichText extends StatelessWidget {
   final Color? color;
   final bool showIcon;
   final Function()? onTap;
+  final Function()? onClearIconTap;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: RichText(
         text: TextSpan(
-          style: textStyle ?? AppTextStyles.bodyLarge.copyWith(color: color),
+          style: textStyle ??
+              AppTextStyles.bodyLarge.copyWith(
+                  color: color ?? Theme.of(context).colorScheme.primary),
           children: [
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
@@ -36,14 +40,19 @@ class DueDateRichText extends StatelessWidget {
             ),
             WidgetSpan(
                 child: SizedBox(width: 3.w)), // spacing between icon and text
-            TextSpan(text: text),
+            TextSpan(
+              text: text,
+            ),
             if (showIcon) WidgetSpan(child: SizedBox(width: 30.w)),
             if (showIcon)
               WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.clear),
+                    onPressed: onClearIconTap,
+                    icon: Icon(
+                      Icons.clear,
+                      color: color ?? Theme.of(context).colorScheme.primary,
+                    ),
                   ))
           ],
         ),

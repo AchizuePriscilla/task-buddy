@@ -9,6 +9,7 @@ class Button extends StatelessWidget {
   final Color? color;
   final Color? textColor;
   final bool isOutlined;
+  final bool isLoading;
   const Button({
     super.key,
     required this.text,
@@ -17,6 +18,7 @@ class Button extends StatelessWidget {
     this.color,
     this.textColor,
     this.isOutlined = false,
+    this.isLoading = false,
   });
 
   @override
@@ -58,8 +60,13 @@ class Button extends StatelessWidget {
                       .withValues(alpha: .4)),
         ),
       ),
-      child: child,
-      onPressed: () => active ? onPressed() : () {},
+      child: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.onPrimary,
+            ))
+          : child,
+      onPressed: () => active && !isLoading ? onPressed() : () {},
     );
   }
 }

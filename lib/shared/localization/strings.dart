@@ -82,4 +82,16 @@ class AppStrings {
   static const String failedToCreateTask = 'Failed to create task:';
   static const String failedToUpdateTask = 'Failed to update task:';
   static const String failedToDeleteTask = 'Failed to delete task:';
+
+  // Form validation strings
+  static const String titleRequired = 'Please enter a title for your task';
+  static const String descriptionRequired =
+      'Please enter a description for your task';
+  static const String categoryRequired =
+      'Please select a category for your task';
+  static const String dueDateRequired =
+      'Please select a due date for your task';
+  static const String dueDatePast = 'Due date cannot be in the past';
+  static const String taskCreatedSuccess = 'Task created successfully!';
+  static const String taskCreationFailed = 'Failed to create task:';
 }
