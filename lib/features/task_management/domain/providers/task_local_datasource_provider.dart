@@ -4,6 +4,6 @@ import 'package:task_buddy/shared/domain/providers/database_provider.dart';
 
 /// Provider for local data source
 final taskLocalDataSourceProvider = Provider<TaskLocalDataSource>((ref) {
-  final databaseService = ref.watch(databaseProvider);
+  final databaseService = ref.watch(initializedDatabaseProvider);
   return TaskLocalDataSource(databaseService);
 });
