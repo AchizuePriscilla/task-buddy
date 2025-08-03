@@ -94,4 +94,7 @@ class AppStrings {
   static const String dueDatePast = 'Due date cannot be in the past';
   static const String taskCreatedSuccess = 'Task created successfully!';
   static const String taskCreationFailed = 'Failed to create task:';
+  static const String taskUpdatedSuccess = 'Task updated successfully!';
+  static const String taskUpdateFailed = 'Failed to update task:';
+  static const String markAsCompleted = 'Mark as completed';
 }

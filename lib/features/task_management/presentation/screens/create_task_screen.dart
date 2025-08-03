@@ -9,6 +9,7 @@ import 'package:task_buddy/features/task_management/presentation/widgets/due_dat
 import 'package:task_buddy/features/task_management/presentation/providers/task_state_provider.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/shared/theme/text_styles.dart';
+import 'package:task_buddy/shared/widgets/custom_snackbar.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/button.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/custom_text_field.dart';
 
@@ -49,18 +50,25 @@ class _TaskFormState extends ConsumerState<TaskForm> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Listen to task state changes
     ref.listen<TaskState>(taskStateProvider, (previous, next) {
       if (previous?.error != next.error && next.error != null) {
         // Show error snackbar
-        _showSnackBar(next.error!, isSuccess: false);
+        CustomSnackBar.showError(context, next.error!);
         // Clear the error after showing it
         ref.read(taskStateProvider.notifier).clearError();
       } else if (previous?.tasks.length != next.tasks.length &&
           next.tasks.length > (previous?.tasks.length ?? 0)) {
         // Task was successfully created (list got longer)
-        _showSnackBar(AppStrings.taskCreatedSuccess, isSuccess: true);
+        CustomSnackBar.showSuccess(context, AppStrings.taskCreatedSuccess);
         Navigator.pop(context);
       }
     });
@@ -190,7 +198,7 @@ class _TaskFormState extends ConsumerState<TaskForm> {
     // Validate due date manually since it's not a TextField
     final dueDateError = FormValidator.validateDueDate(selectedDueDate);
     if (dueDateError != null) {
-      _showSnackBar(dueDateError, isSuccess: false);
+      CustomSnackBar.showError(context, dueDateError);
       return;
     }
 
@@ -209,18 +217,5 @@ class _TaskFormState extends ConsumerState<TaskForm> {
             updatedAt: DateTime.now(),
           ),
         );
-  }
-
-  void _showSnackBar(String message, {required bool isSuccess}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: AppTextStyles.body,
-        ),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 }

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
 import 'package:task_buddy/features/task_management/domain/extensions/datetime_extension.dart';
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
+import 'package:task_buddy/features/task_management/presentation/providers/task_state_provider.dart';
 import 'package:task_buddy/features/task_management/presentation/screens/edit_task_screen.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/due_date_rich_text.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/priority_indicator_chip.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/shared/theme/text_styles.dart';
 
-class TaskCard extends StatefulWidget {
+class TaskCard extends ConsumerStatefulWidget {
   const TaskCard({
     super.key,
     required this.task,
@@ -18,10 +20,10 @@ class TaskCard extends StatefulWidget {
 
   final TaskModel task;
   @override
-  State<TaskCard> createState() => _TaskCardState();
+  ConsumerState<TaskCard> createState() => _TaskCardState();
 }
 
-class _TaskCardState extends State<TaskCard> {
+class _TaskCardState extends ConsumerState<TaskCard> {
   late Color cardColor;
 
   @override
@@ -69,19 +71,31 @@ class _TaskCardState extends State<TaskCard> {
               // Completion checkbox
               Padding(
                 padding: EdgeInsets.only(top: 8.h, left: 5.w),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor.withValues(alpha: 0.3),
+                child: GestureDetector(
+                  onTap: () => _toggleTaskCompletion(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(4.r),
+                      border: Border.all(
+                        color: widget.task.isCompleted
+                            ? Colors.green
+                            : Theme.of(context)
+                                .cardColor
+                                .withValues(alpha: 0.3),
+                        width: .1,
+                      ),
+                    ),
+                    width: 35.w,
+                    height: 35.w,
+                    child: widget.task.isCompleted
+                        ? Icon(
+                            Icons.check,
+                            size: 20.sp,
+                            color: Colors.green,
+                          )
+                        : null,
                   ),
-                  width: 35.w,
-                  height: 35.w,
-                  child: widget.task.isCompleted
-                      ? Icon(
-                          Icons.check,
-                          size: 20.sp,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        )
-                      : null,
                 ),
               ),
               SizedBox(width: 10.w),
@@ -175,5 +189,14 @@ class _TaskCardState extends State<TaskCard> {
             ],
           ),
         ));
+  }
+
+  void _toggleTaskCompletion() {
+    final updatedTask = widget.task.copyWith(
+      isCompleted: !widget.task.isCompleted,
+      updatedAt: DateTime.now(),
+    );
+
+    ref.read(taskStateProvider.notifier).updateTask(updatedTask);
   }
 }
