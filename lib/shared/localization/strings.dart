@@ -9,6 +9,7 @@ class AppStrings {
 
   // App strings
   static const String appName = 'Task Buddy';
+  static const String retry = 'Retry';
 
   // Task strings
   static const String editTask = 'Edit Task';
@@ -54,4 +55,30 @@ class AppStrings {
   static const String health = 'Health';
   static const String finance = 'Finance';
   static const String other = 'Other';
+
+  // Filter strings
+  static const String filterTasks = 'Filter Tasks';
+  static const String clearFilters = 'Clear Filters';
+  static const String clearAll = 'Clear All';
+  static const String apply = 'Apply';
+  static const String clear = 'Clear';
+  static const String all = 'All';
+  static const String completed = 'Completed';
+  static const String pending = 'Pending';
+  static const String status = 'Status';
+  static const String searchTasksHint = 'Search tasks...';
+
+  // Home screen strings
+  static const String total = 'Total';
+  static const String completedWithColon = 'Completed:';
+  static const String pendingWithColon = 'Pending:';
+  static const String errorWithColon = 'Error:';
+  static const String noTasksMatchFilters = 'No tasks match your filters';
+  static const String noTasksFound = 'No tasks found. Create your first task!';
+
+  // Error messages
+  static const String failedToLoadTasks = 'Failed to load tasks:';
+  static const String failedToCreateTask = 'Failed to create task:';
+  static const String failedToUpdateTask = 'Failed to update task:';
+  static const String failedToDeleteTask = 'Failed to delete task:';
 }

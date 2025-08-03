@@ -60,7 +60,7 @@ class _TaskCardState extends State<TaskCard> {
                   ),
           ),
           margin: EdgeInsets.symmetric(
-            horizontal: 10.w,
+            horizontal: 0.w,
             vertical: 10.h,
           ),
           child: Row(

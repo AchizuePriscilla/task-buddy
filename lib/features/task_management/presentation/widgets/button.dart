@@ -8,6 +8,7 @@ class Button extends StatelessWidget {
   final bool active;
   final Color? color;
   final Color? textColor;
+  final bool isOutlined;
   const Button({
     super.key,
     required this.text,
@@ -15,6 +16,7 @@ class Button extends StatelessWidget {
     this.active = true,
     this.color,
     this.textColor,
+    this.isOutlined = false,
   });
 
   @override
@@ -23,8 +25,13 @@ class Button extends StatelessWidget {
         Text(text, style: AppTextStyles.h4.copyWith(color: textColor));
     return TextButton(
       style: ButtonStyle(
-        shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r))),
+        shape: WidgetStateProperty.all(RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+            side: isOutlined
+                ? BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : BorderSide.none)),
         fixedSize: WidgetStateProperty.resolveWith((states) => Size(
               150.w,
               53.h,

@@ -4,10 +4,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:task_buddy/features/task_management/presentation/screens/home_screen.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/shared/theme/app_theme.dart';
+import 'package:task_buddy/shared/data/local/database/hive_database_service.dart';
+import 'package:task_buddy/shared/domain/providers/database_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: MyApp()));
+  final database = HiveDatabaseService();
+  await database.initialize();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        databaseProvider.overrideWithValue(database),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {

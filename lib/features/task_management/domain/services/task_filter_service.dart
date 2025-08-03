@@ -14,32 +14,43 @@ class TaskFilterService {
     DateTime? dueDateFrom,
     DateTime? dueDateTo,
   }) {
-    List<TaskModel> filteredTasks = tasks;
-    return filteredTasks = filteredTasks.where((task) {
-      if (searchQuery != null &&
-          (task.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              (task.description
-                      ?.toLowerCase()
-                      .contains(searchQuery.toLowerCase()) ??
-                  false))) {
-        return true;
+    return tasks.where((task) {
+      // Search query filter
+      if (searchQuery != null && searchQuery.isNotEmpty) {
+        final query = searchQuery.toLowerCase();
+        final titleMatch = task.title.toLowerCase().contains(query);
+        final descriptionMatch =
+            task.description?.toLowerCase().contains(query) ?? false;
+        if (!titleMatch && !descriptionMatch) {
+          return false;
+        }
       }
-      if (category != null && task.category == category) {
-        return true;
+
+      // Category filter
+      if (category != null && task.category != category) {
+        return false;
       }
-      if (priority != null && task.priority == priority) {
-        return true;
+
+      // Priority filter
+      if (priority != null && task.priority != priority) {
+        return false;
       }
-      if (isCompleted != null && task.isCompleted == isCompleted) {
-        return true;
+
+      // Completion status filter
+      if (isCompleted != null && task.isCompleted != isCompleted) {
+        return false;
       }
+
+      // Due date range filter
       if (dueDateFrom != null && task.dueDate.isBefore(dueDateFrom)) {
         return false;
       }
       if (dueDateTo != null && task.dueDate.isAfter(dueDateTo)) {
         return false;
       }
-      return false;
+
+      // If all filters pass, include the task
+      return true;
     }).toList();
   }
 
