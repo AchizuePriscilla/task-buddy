@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
+import 'package:task_buddy/features/task_management/domain/extensions/datetime_extension.dart';
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/domain/models/user_analytics_model.dart';
 import 'package:task_buddy/features/task_management/domain/repositories/task_repository.dart';
@@ -105,7 +106,7 @@ class SmartPriorityCalculator {
 
     if (daysUntilDue < 0) {
       return Priority.urgent; // Overdue
-    } else if (daysUntilDue == 0) {
+    } else if (daysUntilDue == 0 && dueDate.isSameDay(DateTime.now())) {
       return Priority.urgent; // Due today
     } else if (daysUntilDue <= 1) {
       return Priority.high; // Due tomorrow

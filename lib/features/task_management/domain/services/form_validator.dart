@@ -23,15 +23,6 @@ class FormValidator {
     if (dueDate == null) {
       return AppStrings.dueDateRequired;
     }
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final selectedDate = DateTime(dueDate.year, dueDate.month, dueDate.day);
-
-    if (selectedDate.isBefore(today)) {
-      return AppStrings.dueDatePast;
-    }
-
     return null;
   }
 }

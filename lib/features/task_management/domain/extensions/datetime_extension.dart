@@ -23,12 +23,18 @@ extension DateTimeExtension on DateTime {
     return difference(DateTime.now()).inDays;
   }
 
+  bool isSameDay(DateTime dateTime) {
+    return year == dateTime.year &&
+        month == dateTime.month &&
+        day == dateTime.day;
+  }
+
   String get formattedDueDate {
     if (daysUntilDue < 0) {
       return AppStrings.overdue;
-    } else if (daysUntilDue == 0) {
+    } else if (daysUntilDue == 0 && isSameDay(DateTime.now())) {
       return AppStrings.today;
-    } else if (daysUntilDue == 1) {
+    } else if (daysUntilDue <= 1) {
       return AppStrings.tomorrow;
     } else if (daysUntilDue <= 7) {
       return '${AppStrings.inDays} $daysUntilDue ${AppStrings.days}';
