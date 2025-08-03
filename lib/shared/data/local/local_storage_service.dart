@@ -2,8 +2,6 @@
 abstract class LocalStorageService {
   void init();
 
-  bool get hasInitialized;
-
   Future<bool> remove(String key);
 
   Future<Object?> get(String key);

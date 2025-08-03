@@ -3,12 +3,11 @@ import 'package:task_buddy/features/task_management/domain/enums/category_enum.d
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/shared/data/local/database/database_service.dart';
-import 'package:task_buddy/shared/domain/exceptions.dart';
+import 'package:task_buddy/shared/domain/exceptions/database_exception.dart';
 
 /// Hive implementation of DatabaseService
 class HiveDatabaseService implements DatabaseService {
   static const String _tasksBoxName = 'tasks';
-
   Box<TaskModel>? _tasksBox;
 
   @override
@@ -39,7 +38,7 @@ class HiveDatabaseService implements DatabaseService {
     try {
       await _tasksBox!.put(task.id, task);
     } catch (e) {
-      throw DatabaseException('Failed to save task');
+      throw DatabaseException('Failed to save task', e.toString());
     }
   }
 
@@ -50,7 +49,7 @@ class HiveDatabaseService implements DatabaseService {
     try {
       return _tasksBox!.get(id);
     } catch (e) {
-      throw DatabaseException('Failed to retrieve task');
+      throw DatabaseException('Failed to retrieve task', e.toString());
     }
   }
 
@@ -61,7 +60,7 @@ class HiveDatabaseService implements DatabaseService {
     try {
       return _tasksBox!.values.toList();
     } catch (e) {
-      throw DatabaseException('Failed to retrieve tasks');
+      throw DatabaseException('Failed to retrieve tasks', e.toString());
     }
   }
 
@@ -72,59 +71,18 @@ class HiveDatabaseService implements DatabaseService {
     try {
       await _tasksBox!.put(task.id, task);
     } catch (e) {
-      throw DatabaseException('Failed to update task');
+      throw DatabaseException('Failed to update task', e.toString());
     }
   }
 
   @override
-  Future<void> deleteTask(String id) async {
+  Future<void> deleteTask(TaskModel task) async {
     _validateInitialization();
 
     try {
-      await _tasksBox!.delete(id);
+      await _tasksBox!.delete(task.id);
     } catch (e) {
-      throw DatabaseException('Failed to delete task');
-    }
-  }
-
-  @override
-  Future<List<TaskModel>> searchTasks(String query) async {
-    _validateInitialization();
-
-    try {
-      final allTasks = _tasksBox!.values.toList();
-      return allTasks
-          .where((task) =>
-              task.title.toLowerCase().contains(query.toLowerCase()) ||
-              (task.description?.toLowerCase().contains(query.toLowerCase()) ??
-                  false))
-          .toList();
-    } catch (e) {
-      throw DatabaseException('Failed to search tasks');
-    }
-  }
-
-  @override
-  Future<List<TaskModel>> filterTasks({
-    CategoryEnum? category,
-    Priority? priority,
-    bool? isCompleted,
-  }) async {
-    _validateInitialization();
-
-    try {
-      final allTasks = _tasksBox!.values.toList();
-
-      return allTasks.where((task) {
-        if (category != null && task.category != category) return false;
-        if (priority != null && task.priority != priority) return false;
-        if (isCompleted != null && task.isCompleted != isCompleted) {
-          return false;
-        }
-        return true;
-      }).toList();
-    } catch (e) {
-      throw DatabaseException('Failed to filter tasks');
+      throw DatabaseException('Failed to delete task', e.toString());
     }
   }
 
@@ -134,7 +92,7 @@ class HiveDatabaseService implements DatabaseService {
       await _tasksBox?.close();
       _tasksBox = null;
     } catch (e) {
-      throw DatabaseException('Failed to close database');
+      throw DatabaseException('Failed to close database', e.toString());
     }
   }
 
@@ -145,7 +103,7 @@ class HiveDatabaseService implements DatabaseService {
     try {
       await _tasksBox!.clear();
     } catch (e) {
-      throw DatabaseException('Failed to clear database');
+      throw DatabaseException('Failed to clear database', e.toString());
     }
   }
 

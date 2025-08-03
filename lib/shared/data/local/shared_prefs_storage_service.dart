@@ -17,9 +17,6 @@ class SharedPrefsService implements LocalStorageService {
   }
 
   @override
-  bool get hasInitialized => sharedPreferences != null;
-
-  @override
   Future<Object?> get(String key) async {
     sharedPreferences = await initCompleter.future;
     return sharedPreferences!.get(key);
