@@ -73,8 +73,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               alignment: Alignment.center,
               children: [
                 SizedBox(
-                  width: 32.w,
-                  height: 32.h,
+                  width: 40.w,
+                  height: 40.w,
                   child: CircularProgressIndicator(
                     value: completionPercentage / 100,
                     strokeWidth: 3,
@@ -89,7 +89,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 Text(
                   '${completionPercentage.toInt()}%',
-                  style: AppTextStyles.bodySmall.copyWith(
+                  style: AppTextStyles.body.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
