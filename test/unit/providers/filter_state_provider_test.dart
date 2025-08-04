@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
 import 'package:task_buddy/features/task_management/presentation/providers/filter_state_provider.dart';
+import '../../helpers/test_constants.dart';
 
 void main() {
   group('FilterState', () {
@@ -53,7 +54,7 @@ void main() {
 
       test('should return true when due date from is set', () {
         // Arrange
-        final dueDate = DateTime(2024, 1, 1);
+        final dueDate = TestConstants.defaultDueDate;
         final state = FilterState(dueDateFrom: dueDate);
 
         // Act
@@ -65,7 +66,7 @@ void main() {
 
       test('should return true when due date to is set', () {
         // Arrange
-        final dueDate = DateTime(2024, 1, 1);
+        final dueDate = TestConstants.defaultDueDate;
         final state = FilterState(dueDateTo: dueDate);
 
         // Act
@@ -77,7 +78,7 @@ void main() {
 
       test('should return true when search query is not empty', () {
         // Arrange
-        const state = FilterState(searchQuery: 'test query');
+        const state = FilterState(searchQuery: TestConstants.defaultTaskTitle);
 
         // Act
         final result = state.hasActiveFilters;
@@ -91,7 +92,7 @@ void main() {
         final state = FilterState(
           selectedCategory: CategoryEnum.work,
           selectedPriority: Priority.high,
-          searchQuery: 'test',
+          searchQuery: TestConstants.defaultTaskTitle,
         );
 
         // Act
@@ -255,8 +256,8 @@ void main() {
     group('setDateRange', () {
       test('should set date range filters', () {
         // Arrange
-        final fromDate = DateTime(2024, 1, 1);
-        final toDate = DateTime(2024, 1, 31);
+        final fromDate = TestConstants.defaultDueDate;
+        final toDate = TestConstants.pastDueDate;
 
         // Act
         notifier.setDateRange(fromDate, toDate);
@@ -269,7 +270,7 @@ void main() {
 
       test('should set only from date', () {
         // Arrange
-        final fromDate = DateTime(2024, 1, 1);
+        final fromDate = TestConstants.defaultDueDate;
 
         // Act
         notifier.setDateRange(fromDate, null);
@@ -282,7 +283,7 @@ void main() {
 
       test('should set only to date', () {
         // Arrange
-        final toDate = DateTime(2024, 1, 31);
+        final toDate = TestConstants.pastDueDate;
 
         // Act
         notifier.setDateRange(null, toDate);
@@ -295,7 +296,8 @@ void main() {
 
       test('should clear date range when both dates are null', () {
         // Arrange
-        notifier.setDateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 31));
+        notifier.setDateRange(
+            TestConstants.defaultDueDate, TestConstants.pastDueDate);
 
         // Act
         notifier.setDateRange(null, null);
@@ -312,11 +314,13 @@ void main() {
         notifier.setPriority(Priority.high);
 
         // Act
-        notifier.setDateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 31));
+        notifier.setDateRange(
+            TestConstants.defaultDueDate, TestConstants.pastDueDate);
 
         // Assert
-        expect(notifier.state.dueDateFrom, equals(DateTime(2024, 1, 1)));
-        expect(notifier.state.dueDateTo, equals(DateTime(2024, 1, 31)));
+        expect(
+            notifier.state.dueDateFrom, equals(TestConstants.defaultDueDate));
+        expect(notifier.state.dueDateTo, equals(TestConstants.pastDueDate));
         expect(notifier.state.selectedCategory, equals(CategoryEnum.work));
         expect(notifier.state.selectedPriority, equals(Priority.high));
       });
@@ -325,16 +329,17 @@ void main() {
     group('setSearchQuery', () {
       test('should set search query', () {
         // Act
-        notifier.setSearchQuery('test query');
+        notifier.setSearchQuery(TestConstants.defaultTaskTitle);
 
         // Assert
-        expect(notifier.state.searchQuery, equals('test query'));
+        expect(
+            notifier.state.searchQuery, equals(TestConstants.defaultTaskTitle));
         expect(notifier.state.hasActiveFilters, isTrue);
       });
 
       test('should clear search query when empty string is passed', () {
         // Arrange
-        notifier.setSearchQuery('test query');
+        notifier.setSearchQuery(TestConstants.defaultTaskTitle);
 
         // Act
         notifier.setSearchQuery('');
@@ -350,10 +355,11 @@ void main() {
         notifier.setPriority(Priority.high);
 
         // Act
-        notifier.setSearchQuery('test query');
+        notifier.setSearchQuery(TestConstants.defaultTaskTitle);
 
         // Assert
-        expect(notifier.state.searchQuery, equals('test query'));
+        expect(
+            notifier.state.searchQuery, equals(TestConstants.defaultTaskTitle));
         expect(notifier.state.selectedCategory, equals(CategoryEnum.work));
         expect(notifier.state.selectedPriority, equals(Priority.high));
       });
@@ -365,8 +371,9 @@ void main() {
         notifier.setCategory(CategoryEnum.work);
         notifier.setPriority(Priority.high);
         notifier.setCompletionStatus(true);
-        notifier.setDateRange(DateTime(2024, 1, 1), DateTime(2024, 1, 31));
-        notifier.setSearchQuery('test query');
+        notifier.setDateRange(
+            TestConstants.defaultDueDate, TestConstants.pastDueDate);
+        notifier.setSearchQuery(TestConstants.defaultTaskTitle);
 
         // Act
         notifier.clearFilters();
@@ -421,13 +428,14 @@ void main() {
         notifier.setCategory(CategoryEnum.work);
         notifier.setPriority(Priority.high);
         notifier.setCompletionStatus(true);
-        notifier.setSearchQuery('test');
+        notifier.setSearchQuery(TestConstants.defaultTaskTitle);
 
         // Assert
         expect(notifier.state.selectedCategory, equals(CategoryEnum.work));
         expect(notifier.state.selectedPriority, equals(Priority.high));
         expect(notifier.state.selectedCompletionStatus, isTrue);
-        expect(notifier.state.searchQuery, equals('test'));
+        expect(
+            notifier.state.searchQuery, equals(TestConstants.defaultTaskTitle));
         expect(notifier.state.hasActiveFilters, isTrue);
       });
     });

@@ -13,6 +13,8 @@ import 'package:task_buddy/features/task_management/domain/providers/task_reposi
 import 'package:task_buddy/features/task_management/domain/providers/smart_priority_service_provider.dart';
 import 'package:task_buddy/features/task_management/presentation/providers/task_state_provider.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
+import '../../helpers/test_constants.dart';
+import '../../helpers/test_data_factory.dart';
 
 @GenerateMocks([
   TaskRepository,
@@ -27,7 +29,11 @@ void main() {
       test('should create new state with updated tasks', () {
         // Arrange
         const initialState = TaskState();
-        final tasks = [_createTask(id: '1', title: 'Test Task')];
+        final tasks = [
+          TestDataFactory.createTask(
+              id: TestConstants.defaultTaskId,
+              title: TestConstants.defaultTaskTitle)
+        ];
 
         // Act
         final newState = initialState.copyWith(tasks: tasks);
@@ -56,7 +62,7 @@ void main() {
       test('should create new state with updated error', () {
         // Arrange
         const initialState = TaskState();
-        const errorMessage = 'Test error';
+        const errorMessage = TestConstants.defaultErrorMessage;
 
         // Act
         final newState = initialState.copyWith(error: errorMessage);
@@ -71,19 +77,23 @@ void main() {
       test('should create new state with multiple updates', () {
         // Arrange
         const initialState = TaskState();
-        final tasks = [_createTask(id: '1', title: 'Test Task')];
+        final tasks = [
+          TestDataFactory.createTask(
+              id: TestConstants.defaultTaskId,
+              title: TestConstants.defaultTaskTitle)
+        ];
 
         // Act
         final newState = initialState.copyWith(
           tasks: tasks,
           isLoading: true,
-          error: 'Test error',
+          error: TestConstants.defaultErrorMessage,
         );
 
         // Assert
         expect(newState.tasks, equals(tasks));
         expect(newState.isLoading, isTrue);
-        expect(newState.error, equals('Test error'));
+        expect(newState.error, equals(TestConstants.defaultErrorMessage));
         expect(newState, isNot(same(initialState)));
       });
     });

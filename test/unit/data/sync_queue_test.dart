@@ -1,15 +1,24 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
-import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
-import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/shared/data/sync/sync_queue.dart';
 import 'package:task_buddy/shared/data/sync/shared_prefs_sync_queue_storage.dart';
+import '../../helpers/test_constants.dart';
+import '../../helpers/test_data_factory.dart';
 
 // Generate mocks
 @GenerateMocks([SharedPrefsSyncQueueStorage])
 import 'sync_queue_test.mocks.dart';
+
+// Helper function for creating SyncOperation objects
+SyncOperation _createSyncOperation(String id, SyncOperationType type) {
+  return SyncOperation(
+    id: id,
+    type: type,
+    task: TestDataFactory.createTask(id: id),
+    timestamp: DateTime.now(),
+  );
+}
 
 void main() {
   group('SyncQueue', () {
@@ -35,7 +44,8 @@ void main() {
 
     test('should add operation to queue', () async {
       // Arrange
-      final operation = _createSyncOperation('1', SyncOperationType.create);
+      final operation = _createSyncOperation(
+          TestConstants.defaultTaskId, SyncOperationType.create);
       when(mockStorage.saveOperations(argThat(isA<List<SyncOperation>>())))
           .thenAnswer((_) => Future.value());
 
@@ -48,7 +58,8 @@ void main() {
 
     test('should process operations successfully', () async {
       // Arrange
-      final operation = _createSyncOperation('1', SyncOperationType.create);
+      final operation = _createSyncOperation(
+          TestConstants.defaultTaskId, SyncOperationType.create);
       when(mockStorage.saveOperations(argThat(isA<List<SyncOperation>>())))
           .thenAnswer((_) => Future.value());
       await syncQueue.enqueue(operation);
@@ -68,13 +79,14 @@ void main() {
 
     test('should handle operation failures gracefully', () async {
       // Arrange
-      final operation = _createSyncOperation('1', SyncOperationType.create);
+      final operation = _createSyncOperation(
+          TestConstants.defaultTaskId, SyncOperationType.create);
       when(mockStorage.saveOperations(argThat(isA<List<SyncOperation>>())))
           .thenAnswer((_) => Future.value());
       await syncQueue.enqueue(operation);
 
       Future<void> failingSyncFunction(SyncOperation operation) async {
-        throw Exception('Sync failed');
+        throw Exception(TestConstants.defaultErrorMessage);
       }
 
       // Act & Assert
@@ -85,7 +97,8 @@ void main() {
 
     test('should handle storage errors gracefully', () async {
       // Arrange
-      final operation = _createSyncOperation('1', SyncOperationType.create);
+      final operation = _createSyncOperation(
+          TestConstants.defaultTaskId, SyncOperationType.create);
       when(mockStorage.saveOperations(argThat(isA<List<SyncOperation>>())))
           .thenThrow(Exception('Storage error'));
 
@@ -98,8 +111,10 @@ void main() {
     test('should load existing operations on initialization', () async {
       // Arrange
       final existingOperations = [
-        _createSyncOperation('1', SyncOperationType.create),
-        _createSyncOperation('2', SyncOperationType.update),
+        _createSyncOperation(
+            TestConstants.defaultTaskId, SyncOperationType.create),
+        _createSyncOperation(
+            TestConstants.defaultTaskId2, SyncOperationType.update),
       ];
       when(mockStorage.loadOperations())
           .thenAnswer((_) => Future.value(existingOperations));
@@ -125,7 +140,8 @@ void main() {
 
     test('should clear all operations', () async {
       // Arrange
-      final operation = _createSyncOperation('1', SyncOperationType.create);
+      final operation = _createSyncOperation(
+          TestConstants.defaultTaskId, SyncOperationType.create);
       when(mockStorage.saveOperations(argThat(isA<List<SyncOperation>>())))
           .thenAnswer((_) => Future.value());
       await syncQueue.enqueue(operation);
@@ -139,7 +155,8 @@ void main() {
 
     test('should not process when already processing', () async {
       // Arrange
-      final operation = _createSyncOperation('1', SyncOperationType.create);
+      final operation = _createSyncOperation(
+          TestConstants.defaultTaskId, SyncOperationType.create);
       when(mockStorage.saveOperations(argThat(isA<List<SyncOperation>>())))
           .thenAnswer((_) => Future.value());
       await syncQueue.enqueue(operation);
@@ -166,9 +183,12 @@ void main() {
     test('should process multiple operations', () async {
       // Arrange
       final operations = [
-        _createSyncOperation('1', SyncOperationType.create),
-        _createSyncOperation('2', SyncOperationType.update),
-        _createSyncOperation('3', SyncOperationType.delete),
+        _createSyncOperation(
+            TestConstants.defaultTaskId, SyncOperationType.create),
+        _createSyncOperation(
+            TestConstants.defaultTaskId2, SyncOperationType.update),
+        _createSyncOperation(
+            TestConstants.defaultTaskId3, SyncOperationType.delete),
       ];
       when(mockStorage.saveOperations(argThat(isA<List<SyncOperation>>())))
           .thenAnswer((_) => Future.value());
@@ -187,26 +207,10 @@ void main() {
 
       // Assert
       expect(processedOperations.length, equals(3));
-      expect(processedOperations, contains('1'));
-      expect(processedOperations, contains('2'));
-      expect(processedOperations, contains('3'));
+      expect(processedOperations, contains(TestConstants.defaultTaskId));
+      expect(processedOperations, contains(TestConstants.defaultTaskId2));
+      expect(processedOperations, contains(TestConstants.defaultTaskId3));
       expect(syncQueue.isEmpty, isTrue);
     });
   });
-}
-
-SyncOperation _createSyncOperation(String id, SyncOperationType type) {
-  return SyncOperation(
-    id: id,
-    type: type,
-    task: TaskModel(
-      id: id,
-      title: 'Test Task $id',
-      description: 'Test description',
-      category: CategoryEnum.work,
-      dueDate: DateTime.now().add(const Duration(days: 1)),
-      priority: Priority.medium,
-    ),
-    timestamp: DateTime.now(),
-  );
 }

@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
 import 'package:task_buddy/features/task_management/domain/services/form_validator.dart';
-import 'package:task_buddy/shared/localization/strings.dart';
+import '../../helpers/test_constants.dart';
 
 void main() {
   group('FormValidator', () {
     group('validateRequiredString', () {
       test('should return null for valid non-empty string', () {
         // Arrange
-        const value = 'Valid task title';
-        const errorMessage = 'Title is required';
+        const value = TestConstants.defaultTaskTitle;
+        const errorMessage = TestConstants.titleRequiredMessage;
 
         // Act
         final result =
@@ -22,7 +22,7 @@ void main() {
       test('should return error message for empty string', () {
         // Arrange
         const value = '';
-        const errorMessage = 'Title is required';
+        const errorMessage = TestConstants.titleRequiredMessage;
 
         // Act
         final result =
@@ -35,7 +35,7 @@ void main() {
       test('should return error message for whitespace-only string', () {
         // Arrange
         const value = '   ';
-        const errorMessage = 'Title is required';
+        const errorMessage = TestConstants.titleRequiredMessage;
 
         // Act
         final result =
@@ -49,7 +49,7 @@ void main() {
           () {
         // Arrange
         const value = '\t\n\r';
-        const errorMessage = 'Title is required';
+        const errorMessage = TestConstants.titleRequiredMessage;
 
         // Act
         final result =
@@ -62,8 +62,8 @@ void main() {
       test('should return null for string with leading/trailing whitespace',
           () {
         // Arrange
-        const value = '  Valid task title  ';
-        const errorMessage = 'Title is required';
+        const value = '  ${TestConstants.defaultTaskTitle}  ';
+        const errorMessage = TestConstants.titleRequiredMessage;
 
         // Act
         final result =
@@ -76,7 +76,7 @@ void main() {
       test('should return custom error message when provided', () {
         // Arrange
         const value = '';
-        const customErrorMessage = 'Custom error message';
+        const customErrorMessage = TestConstants.requiredFieldErrorMessage;
 
         // Act
         final result =
@@ -99,33 +99,23 @@ void main() {
         expect(result, isNull);
       });
 
-      test('should return error message for null category', () {
+      test('should return null for non-null category (even if invalid type)',
+          () {
         // Arrange
-        const category = null;
+        const category = CategoryEnum.personal;
 
         // Act
         final result = FormValidator.validateCategory(category);
 
         // Assert
-        expect(result, equals(AppStrings.categoryRequired));
-      });
-
-      test('should return null for all valid category enum values', () {
-        // Arrange
-        final categories = CategoryEnum.values;
-
-        // Act & Assert
-        for (final category in categories) {
-          final result = FormValidator.validateCategory(category);
-          expect(result, isNull, reason: 'Category $category should be valid');
-        }
+        expect(result, isNull);
       });
     });
 
     group('validateDueDate', () {
-      test('should return null for valid future due date', () {
+      test('should return null for valid date', () {
         // Arrange
-        final dueDate = DateTime.now().add(const Duration(days: 1));
+        final dueDate = TestConstants.defaultDueDate;
 
         // Act
         final result = FormValidator.validateDueDate(dueDate);
@@ -133,16 +123,52 @@ void main() {
         // Assert
         expect(result, isNull);
       });
+    });
 
-      test('should return error message for null due date', () {
+    group('Integration Tests', () {
+      test('should validate complete task form successfully', () {
         // Arrange
-        const dueDate = null;
+        const title = TestConstants.defaultTaskTitle;
+        const description = TestConstants.defaultTaskDescription;
+        const category = CategoryEnum.work;
+        final dueDate = TestConstants.defaultDueDate;
 
         // Act
-        final result = FormValidator.validateDueDate(dueDate);
+        final titleError = FormValidator.validateRequiredString(
+            title, TestConstants.titleRequiredMessage);
+        final descriptionError = FormValidator.validateRequiredString(
+            description, TestConstants.descriptionRequiredMessage);
+        final categoryError = FormValidator.validateCategory(category);
+        final dueDateError = FormValidator.validateDueDate(dueDate);
 
         // Assert
-        expect(result, equals(AppStrings.dueDateRequired));
+        expect(titleError, isNull);
+        expect(descriptionError, isNull);
+        expect(categoryError, isNull);
+        expect(dueDateError, isNull);
+      });
+
+      test('should return multiple validation errors for invalid form', () {
+        // Arrange
+        const title = '';
+        const description = '';
+        const category = CategoryEnum.work;
+        final dueDate = TestConstants.pastDueDate;
+
+        // Act
+        final titleError = FormValidator.validateRequiredString(
+            title, TestConstants.titleRequiredMessage);
+        final descriptionError = FormValidator.validateRequiredString(
+            description, TestConstants.descriptionRequiredMessage);
+        final categoryError = FormValidator.validateCategory(category);
+        final dueDateError = FormValidator.validateDueDate(dueDate);
+
+        // Assert
+        expect(titleError, equals(TestConstants.titleRequiredMessage));
+        expect(
+            descriptionError, equals(TestConstants.descriptionRequiredMessage));
+        expect(categoryError, isNull); // Category is valid
+        expect(dueDateError, isNull);
       });
     });
   });

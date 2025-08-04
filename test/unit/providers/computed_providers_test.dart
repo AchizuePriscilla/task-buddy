@@ -2,10 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-
 import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
-import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/domain/services/task_filter_service.dart';
 import 'package:task_buddy/features/task_management/domain/providers/task_filter_service_provider.dart';
 import 'package:task_buddy/features/task_management/domain/repositories/task_repository.dart';
@@ -14,6 +12,8 @@ import 'package:task_buddy/features/task_management/domain/services/user_analyti
 import 'package:task_buddy/features/task_management/presentation/providers/computed_providers.dart';
 import 'package:task_buddy/features/task_management/presentation/providers/task_state_provider.dart';
 import 'package:task_buddy/features/task_management/presentation/providers/filter_state_provider.dart';
+import '../../helpers/test_constants.dart';
+import '../../helpers/test_data_factory.dart';
 
 @GenerateMocks([
   TaskFilterService,
@@ -51,8 +51,9 @@ void main() {
       test('should return filtered tasks based on current state', () {
         // Arrange
         final tasks = [
-          _createTask(id: '1', title: 'Work Task', category: CategoryEnum.work),
-          _createTask(
+          TestDataFactory.createTask(
+              id: '1', title: 'Work Task', category: CategoryEnum.work),
+          TestDataFactory.createTask(
               id: '2', title: 'Personal Task', category: CategoryEnum.personal),
         ];
         final filteredTasks = [tasks.first];
@@ -121,12 +122,12 @@ void main() {
       test('should apply multiple filters', () {
         // Arrange
         final tasks = [
-          _createTask(
+          TestDataFactory.createTask(
               id: '1',
               title: 'High Priority Work Task',
               category: CategoryEnum.work,
               priority: Priority.high),
-          _createTask(
+          TestDataFactory.createTask(
               id: '2',
               title: 'Low Priority Personal Task',
               category: CategoryEnum.personal,
@@ -175,10 +176,11 @@ void main() {
       test('should return task counts for all categories', () {
         // Arrange
         final tasks = [
-          _createTask(id: '1', title: 'Work Task', category: CategoryEnum.work),
-          _createTask(
+          TestDataFactory.createTask(
+              id: '1', title: 'Work Task', category: CategoryEnum.work),
+          TestDataFactory.createTask(
               id: '2', title: 'Personal Task', category: CategoryEnum.personal),
-          _createTask(
+          TestDataFactory.createTask(
               id: '3', title: 'Another Work Task', category: CategoryEnum.work),
         ];
         final expectedCounts = {
@@ -234,14 +236,14 @@ void main() {
       test('should return overdue tasks', () {
         // Arrange
         final tasks = [
-          _createTask(
+          TestDataFactory.createTask(
               id: '1',
               title: 'Overdue Task',
-              dueDate: DateTime.now().subtract(const Duration(days: 1))),
-          _createTask(
+              dueDate: TestConstants.pastDueDate),
+          TestDataFactory.createTask(
               id: '2',
               title: 'Future Task',
-              dueDate: DateTime.now().add(const Duration(days: 1))),
+              dueDate: TestConstants.defaultDueDate),
         ];
         final overdueTasks = [tasks.first];
 
@@ -263,10 +265,10 @@ void main() {
       test('should return empty list when no overdue tasks', () {
         // Arrange
         final tasks = [
-          _createTask(
+          TestDataFactory.createTask(
               id: '1',
               title: 'Future Task',
-              dueDate: DateTime.now().add(const Duration(days: 1))),
+              dueDate: TestConstants.defaultDueDate),
         ];
 
         container.read(taskStateProvider.notifier).state = container
@@ -289,11 +291,12 @@ void main() {
       test('should return tasks due today', () {
         // Arrange
         final tasks = [
-          _createTask(id: '1', title: 'Today Task', dueDate: DateTime.now()),
-          _createTask(
+          TestDataFactory.createTask(
+              id: '1', title: 'Today Task', dueDate: DateTime.now()),
+          TestDataFactory.createTask(
               id: '2',
               title: 'Tomorrow Task',
-              dueDate: DateTime.now().add(const Duration(days: 1))),
+              dueDate: TestConstants.defaultDueDate),
         ];
         final todayTasks = [tasks.first];
 
@@ -315,10 +318,10 @@ void main() {
       test('should return empty list when no tasks due today', () {
         // Arrange
         final tasks = [
-          _createTask(
+          TestDataFactory.createTask(
               id: '1',
               title: 'Tomorrow Task',
-              dueDate: DateTime.now().add(const Duration(days: 1))),
+              dueDate: TestConstants.defaultDueDate),
         ];
 
         container.read(taskStateProvider.notifier).state = container
@@ -405,8 +408,10 @@ void main() {
       test('should return 100.0 when all tasks are completed', () {
         // Arrange
         final tasks = [
-          _createTask(id: '1', title: 'Completed Task 1', isCompleted: true),
-          _createTask(id: '2', title: 'Completed Task 2', isCompleted: true),
+          TestDataFactory.createCompletedTask(
+              id: '1', title: 'Completed Task 1'),
+          TestDataFactory.createCompletedTask(
+              id: '2', title: 'Completed Task 2'),
         ];
 
         container.read(taskStateProvider.notifier).state = container
@@ -424,8 +429,9 @@ void main() {
       test('should return 50.0 when half of tasks are completed', () {
         // Arrange
         final tasks = [
-          _createTask(id: '1', title: 'Completed Task', isCompleted: true),
-          _createTask(id: '2', title: 'Incomplete Task', isCompleted: false),
+          TestDataFactory.createCompletedTask(id: '1', title: 'Completed Task'),
+          TestDataFactory.createTask(
+              id: '2', title: 'Incomplete Task', isCompleted: false),
         ];
 
         container.read(taskStateProvider.notifier).state = container
@@ -443,8 +449,10 @@ void main() {
       test('should return 0.0 when no tasks are completed', () {
         // Arrange
         final tasks = [
-          _createTask(id: '1', title: 'Incomplete Task 1', isCompleted: false),
-          _createTask(id: '2', title: 'Incomplete Task 2', isCompleted: false),
+          TestDataFactory.createTask(
+              id: '1', title: 'Incomplete Task 1', isCompleted: false),
+          TestDataFactory.createTask(
+              id: '2', title: 'Incomplete Task 2', isCompleted: false),
         ];
 
         container.read(taskStateProvider.notifier).state = container
@@ -463,10 +471,12 @@ void main() {
     group('Provider Reactivity', () {
       test('should update filtered tasks when task state changes', () {
         // Arrange
-        final initialTasks = [_createTask(id: '1', title: 'Initial Task')];
+        final initialTasks = [
+          TestDataFactory.createTask(id: '1', title: 'Initial Task')
+        ];
         final newTasks = [
-          _createTask(id: '1', title: 'Initial Task'),
-          _createTask(id: '2', title: 'New Task'),
+          TestDataFactory.createTask(id: '1', title: 'Initial Task'),
+          TestDataFactory.createTask(id: '2', title: 'New Task'),
         ];
 
         container.read(taskStateProvider.notifier).state = container
@@ -532,8 +542,9 @@ void main() {
       test('should update filtered tasks when filter state changes', () {
         // Arrange
         final tasks = [
-          _createTask(id: '1', title: 'Work Task', category: CategoryEnum.work),
-          _createTask(
+          TestDataFactory.createTask(
+              id: '1', title: 'Work Task', category: CategoryEnum.work),
+          TestDataFactory.createTask(
               id: '2', title: 'Personal Task', category: CategoryEnum.personal),
         ];
 
@@ -579,24 +590,4 @@ void main() {
       });
     });
   });
-}
-
-TaskModel _createTask({
-  required String id,
-  String title = 'Test Task',
-  String? description,
-  CategoryEnum category = CategoryEnum.work,
-  Priority priority = Priority.medium,
-  DateTime? dueDate,
-  bool isCompleted = false,
-}) {
-  return TaskModel(
-    id: id,
-    title: title,
-    description: description,
-    category: category,
-    dueDate: dueDate ?? DateTime.now().add(const Duration(days: 1)),
-    priority: priority,
-    isCompleted: isCompleted,
-  );
 }

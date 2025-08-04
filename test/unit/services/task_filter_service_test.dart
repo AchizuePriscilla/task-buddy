@@ -3,6 +3,8 @@ import 'package:task_buddy/features/task_management/domain/enums/category_enum.d
 import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/domain/services/task_filter_service.dart';
+import '../../helpers/test_constants.dart';
+import '../../helpers/test_data_factory.dart';
 
 void main() {
   group('TaskFilterService', () {
@@ -12,17 +14,16 @@ void main() {
     setUp(() {
       filterService = TaskFilterService();
       testTasks = [
-        _createTask(
-          id: '1',
+        TestDataFactory.createTask(
+          id: TestConstants.defaultTaskId,
           title: 'Work Task',
           description: 'Important work task',
           category: CategoryEnum.work,
           priority: Priority.high,
-          dueDate: DateTime.now().add(const Duration(days: 1)),
-          isCompleted: false,
+          dueDate: TestConstants.defaultDueDate,
         ),
-        _createTask(
-          id: '2',
+        TestDataFactory.createTask(
+          id: TestConstants.defaultTaskId2,
           title: 'Personal Task',
           description: 'Personal todo',
           category: CategoryEnum.personal,
@@ -30,23 +31,21 @@ void main() {
           dueDate: DateTime.now().add(const Duration(days: 2)),
           isCompleted: true,
         ),
-        _createTask(
-          id: '3',
+        TestDataFactory.createTask(
+          id: TestConstants.defaultTaskId3,
           title: 'Home Task',
           description: 'Buy groceries',
           category: CategoryEnum.home,
           priority: Priority.low,
-          dueDate: DateTime.now().subtract(const Duration(days: 1)), // Overdue
-          isCompleted: false,
+          dueDate: TestConstants.pastDueDate,
         ),
-        _createTask(
+        TestDataFactory.createTask(
           id: '4',
           title: 'Another Work Task',
           description: 'Another important task',
           category: CategoryEnum.work,
           priority: Priority.urgent,
           dueDate: DateTime.now().add(const Duration(days: 3)),
-          isCompleted: false,
         ),
       ];
     });
@@ -183,16 +182,16 @@ void main() {
 
         // Assert
         expect(result.length, equals(1));
-        expect(result.first.id, equals('3'));
+        expect(result.first.id, equals(TestConstants.defaultTaskId3));
         expect(result.first.isCompleted, isFalse);
         expect(result.first.dueDate.isBefore(DateTime.now()), isTrue);
       });
 
       test('should not return completed overdue tasks', () {
         // Arrange
-        final completedOverdueTask = _createTask(
+        final completedOverdueTask = TestDataFactory.createTask(
           id: '5',
-          dueDate: DateTime.now().subtract(const Duration(days: 1)),
+          dueDate: TestConstants.pastDueDate,
           isCompleted: true,
         );
         final tasksWithCompleted = [...testTasks, completedOverdueTask];
@@ -202,14 +201,14 @@ void main() {
 
         // Assert
         expect(result.length, equals(1));
-        expect(result.first.id, equals('3'));
+        expect(result.first.id, equals(TestConstants.defaultTaskId3));
       });
     });
 
     group('getTasksDueToday', () {
       test('should return tasks due today', () {
         // Arrange - Create a task due today
-        final todayTask = _createTask(
+        final todayTask = TestDataFactory.createTask(
           id: '5',
           title: 'Today Task',
           dueDate: DateTime.now(),
@@ -239,7 +238,7 @@ void main() {
 
         // Assert
         expect(result.length, equals(1));
-        expect(result.first.id, equals('1'));
+        expect(result.first.id, equals(TestConstants.defaultTaskId));
         expect(result.first.dueDate.day, equals(specificDate.day));
         expect(result.first.dueDate.month, equals(specificDate.month));
         expect(result.first.dueDate.year, equals(specificDate.year));
@@ -272,24 +271,4 @@ void main() {
       });
     });
   });
-}
-
-TaskModel _createTask({
-  required String id,
-  String title = 'Test Task',
-  String? description,
-  CategoryEnum category = CategoryEnum.work,
-  Priority priority = Priority.medium,
-  DateTime? dueDate,
-  bool isCompleted = false,
-}) {
-  return TaskModel(
-    id: id,
-    title: title,
-    description: description,
-    category: category,
-    dueDate: dueDate ?? DateTime.now().add(const Duration(days: 1)),
-    priority: priority,
-    isCompleted: isCompleted,
-  );
 }

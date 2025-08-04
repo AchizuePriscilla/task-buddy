@@ -2,14 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:task_buddy/features/task_management/data/datasources/task_local_datasource.dart';
-import 'package:task_buddy/features/task_management/domain/enums/category_enum.dart';
-import 'package:task_buddy/features/task_management/domain/enums/priority_enum.dart';
-import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/data/repositories/task_repository_impl.dart';
 import 'package:task_buddy/features/task_management/domain/services/task_sync_service.dart';
 import 'package:task_buddy/shared/data/sync/sync_queue.dart';
 import 'package:task_buddy/shared/domain/exceptions/database_exception.dart';
 import 'package:task_buddy/shared/domain/exceptions/task_repository_exception.dart';
+import '../../helpers/test_constants.dart';
+import '../../helpers/test_data_factory.dart';
 
 // Generate mocks
 @GenerateMocks([TaskLocalDataSource, TaskSyncService])
@@ -35,7 +34,7 @@ void main() {
     group('createTask', () {
       test('should create task successfully', () async {
         // Arrange
-        final task = _createTask(id: '1');
+        final task = TestDataFactory.createTask(id: '1');
         when(mockLocalDataSource.createTask(task))
             .thenAnswer((_) => Future.value());
         when(mockSyncService.queueSyncOperation(SyncOperationType.create, task))
@@ -54,9 +53,9 @@ void main() {
       test('should throw TaskRepositoryException when local data source fails',
           () async {
         // Arrange
-        final task = _createTask(id: '1');
+        final task = TestDataFactory.createTask(id: '1');
         when(mockLocalDataSource.createTask(task))
-            .thenThrow(DatabaseException('Database error'));
+            .thenThrow(DatabaseException(TestConstants.databaseErrorMessage));
 
         // Act & Assert
         expect(
@@ -70,7 +69,7 @@ void main() {
     group('getTaskById', () {
       test('should return task when found', () async {
         // Arrange
-        final task = _createTask(id: '1');
+        final task = TestDataFactory.createTask(id: '1');
         when(mockLocalDataSource.getTaskById('1'))
             .thenAnswer((_) => Future.value(task));
 
@@ -99,7 +98,7 @@ void main() {
           () async {
         // Arrange
         when(mockLocalDataSource.getTaskById('1'))
-            .thenThrow(DatabaseException('Database error'));
+            .thenThrow(DatabaseException(TestConstants.databaseErrorMessage));
 
         // Act & Assert
         expect(
@@ -113,8 +112,8 @@ void main() {
       test('should return all tasks successfully', () async {
         // Arrange
         final tasks = [
-          _createTask(id: '1'),
-          _createTask(id: '2'),
+          TestDataFactory.createTask(id: '1'),
+          TestDataFactory.createTask(id: '2'),
         ];
         when(mockLocalDataSource.getAllTasks())
             .thenAnswer((_) => Future.value(tasks));
@@ -144,7 +143,7 @@ void main() {
           () async {
         // Arrange
         when(mockLocalDataSource.getAllTasks())
-            .thenThrow(DatabaseException('Database error'));
+            .thenThrow(DatabaseException(TestConstants.databaseErrorMessage));
 
         // Act & Assert
         expect(
@@ -157,7 +156,7 @@ void main() {
     group('updateTask', () {
       test('should update task successfully', () async {
         // Arrange
-        final task = _createTask(id: '1');
+        final task = TestDataFactory.createTask(id: '1');
         when(mockLocalDataSource.updateTask(task))
             .thenAnswer((_) => Future.value());
         when(mockSyncService.queueSyncOperation(SyncOperationType.update, task))
@@ -176,9 +175,9 @@ void main() {
       test('should throw TaskRepositoryException when local data source fails',
           () async {
         // Arrange
-        final task = _createTask(id: '1');
+        final task = TestDataFactory.createTask(id: '1');
         when(mockLocalDataSource.updateTask(task))
-            .thenThrow(DatabaseException('Database error'));
+            .thenThrow(DatabaseException(TestConstants.databaseErrorMessage));
 
         // Act & Assert
         expect(
@@ -192,7 +191,7 @@ void main() {
     group('deleteTask', () {
       test('should delete task successfully', () async {
         // Arrange
-        final task = _createTask(id: '1');
+        final task = TestDataFactory.createTask(id: '1');
         when(mockLocalDataSource.deleteTask(task))
             .thenAnswer((_) => Future.value());
         when(mockSyncService.queueSyncOperation(SyncOperationType.delete, task))
@@ -211,9 +210,9 @@ void main() {
       test('should throw TaskRepositoryException when local data source fails',
           () async {
         // Arrange
-        final task = _createTask(id: '1');
+        final task = TestDataFactory.createTask(id: '1');
         when(mockLocalDataSource.deleteTask(task))
-            .thenThrow(DatabaseException('Database error'));
+            .thenThrow(DatabaseException(TestConstants.databaseErrorMessage));
 
         // Act & Assert
         expect(
@@ -224,24 +223,4 @@ void main() {
       });
     });
   });
-}
-
-TaskModel _createTask({
-  required String id,
-  String title = 'Test Task',
-  String? description,
-  CategoryEnum category = CategoryEnum.work,
-  Priority priority = Priority.medium,
-  DateTime? dueDate,
-  bool isCompleted = false,
-}) {
-  return TaskModel(
-    id: id,
-    title: title,
-    description: description,
-    category: category,
-    dueDate: dueDate ?? DateTime.now().add(const Duration(days: 1)),
-    priority: priority,
-    isCompleted: isCompleted,
-  );
 }
