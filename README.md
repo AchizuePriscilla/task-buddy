@@ -75,7 +75,7 @@ lib/
 
 ### Prerequisites
 
-- Flutter SDK 3.6.0 or higher
+- Flutter SDK 3.27.1 or higher
 - Dart SDK 3.6.0 or higher
 - Android Studio / VS Code with Flutter extensions
 - Git
@@ -127,22 +127,14 @@ flutter test integration_test/
 flutter test integration_test/home_screen_test.dart
 ```
 
+
+##Test Coverage
+```bash
+flutter test --coverage
+
+genhtml coverage/lcov.info -o coverage/html
 ```
 
-### Test Structure
-```
-test/
-├── unit/                    # Unit tests for business logic
-│   ├── services/           # Service layer tests
-│   ├── providers/          # State management tests
-│   ├── repositories/       # Data layer tests
-│   └── models/             # Model tests
-├── widget/                 # Widget tests
-└── helpers/                # Test utilities and factories
-
-integration_test/           # End-to-end integration tests
-├── home_screen_test.dart
-```
 
 ## 🔧 Development
 
@@ -164,78 +156,6 @@ flutter packages pub run build_runner build
 # Watch for changes and regenerate automatically
 flutter packages pub run build_runner watch
 ```
-
-### Project Structure
-
-```
-lib/
-├── features/
-│   └── task_management/
-│       ├── data/
-│       │   ├── datasources/        # Data sources (local/remote)
-│       │   └── repositories/       # Repository implementations
-│       ├── domain/
-│       │   ├── enums/             # Enumerations
-│       │   ├── extensions/        # Extension methods
-│       │   ├── models/            # Domain models
-│       │   ├── providers/         # Dependency injection providers
-│       │   ├── repositories/      # Repository interfaces
-│       │   └── services/          # Business logic services
-│       └── presentation/
-│           ├── providers/         # UI state providers
-│           ├── screens/           # Screen widgets
-│           └── widgets/           # Reusable UI components
-├── shared/
-│   ├── data/
-│   │   ├── local/                # Local storage services
-│   │   └── sync/                 # Synchronization logic
-│   ├── domain/
-│   │   ├── exceptions/           # Custom exceptions
-│   │   └── providers/            # Shared providers
-│   ├── theme/                    # App theming
-│   └── localization/             # String resources
-└── main.dart
-```
-
-### State Management
-
-Task Buddy uses **Riverpod** for state management:
-
-- **StateNotifierProvider**: For complex state logic
-- **Provider**: For simple values and dependencies
-- **FutureProvider**: For async operations
-- **ComputedProvider**: For derived state
-
-### Database Schema
-
-The app uses **Hive** for local storage with the following collections:
-- **Tasks**: Task data with relationships
-- **User Analytics**: Usage statistics and patterns
-- **Sync Queue**: Pending synchronization operations
-
-## 🎨 Theming
-
-The app supports both light and dark themes with:
-- **Material Design 3** color system
-- **Automatic theme persistence**
-- **Dynamic theme switching**
-- **Responsive typography**
-
-## 📊 Analytics
-
-Task Buddy includes built-in analytics for:
-- Task creation and completion patterns
-- Category usage statistics
-- Productivity metrics
-- User behavior insights
-
-## 🔄 Synchronization
-
-The app implements an offline-first architecture with:
-- **Local-first data storage**
-- **Queue-based synchronization**
-- **Conflict resolution algorithms**
-- **Automatic retry mechanisms**
 
 ### To run:
 ```bash
