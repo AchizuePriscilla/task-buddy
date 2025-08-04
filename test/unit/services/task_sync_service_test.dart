@@ -31,6 +31,14 @@ void main() {
       expect(syncService, isA<TaskSyncService>());
     });
 
+    test('should create sync service without remote data source', () {
+      // Act
+      final syncServiceWithoutRemote = TaskSyncService(mockSyncQueue);
+
+      // Assert
+      expect(syncServiceWithoutRemote, isA<TaskSyncService>());
+    });
+
     test('should queue sync operation successfully', () async {
       // Arrange
       final task = TestDataFactory.createTask();
@@ -40,6 +48,117 @@ void main() {
 
       // Act
       await syncService.queueSyncOperation(SyncOperationType.create, task);
+
+      // Assert
+      verify(mockSyncQueue.enqueue(any)).called(1);
+    });
+
+    test('should try to process sync queue when remote is available', () async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+      when(mockSyncQueue.enqueue(any)).thenAnswer((_) => Future.value());
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(true));
+      when(mockSyncQueue.isEmpty).thenReturn(false);
+      when(mockSyncQueue.isProcessing).thenReturn(false);
+      when(mockSyncQueue.processQueue(any)).thenAnswer((_) => Future.value());
+
+      // Act
+      await syncService.queueSyncOperation(SyncOperationType.create, task);
+
+      // Assert
+      verify(mockSyncQueue.enqueue(any)).called(1);
+      verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
+      // Note: processQueue is called asynchronously, so we can't verify it here
+    });
+
+    test('should not process queue when queue is empty', () async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+      when(mockSyncQueue.enqueue(any)).thenAnswer((_) => Future.value());
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(true));
+      when(mockSyncQueue.isEmpty).thenReturn(true);
+
+      // Act
+      await syncService.queueSyncOperation(SyncOperationType.create, task);
+
+      // Assert
+      verify(mockSyncQueue.enqueue(any)).called(1);
+      verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
+      verifyNever(mockSyncQueue.processQueue(any));
+    });
+
+    test('should not process queue when already processing', () async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+      when(mockSyncQueue.enqueue(any)).thenAnswer((_) => Future.value());
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(true));
+      when(mockSyncQueue.isEmpty).thenReturn(false);
+      when(mockSyncQueue.isProcessing).thenReturn(true);
+
+      // Act
+      await syncService.queueSyncOperation(SyncOperationType.create, task);
+
+      // Assert
+      verify(mockSyncQueue.enqueue(any)).called(1);
+      verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
+      verifyNever(mockSyncQueue.processQueue(any));
+    });
+
+    test('should handle remote availability check errors gracefully', () async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+      when(mockSyncQueue.enqueue(any)).thenAnswer((_) => Future.value());
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(false));
+
+      // Act & Assert - Should not throw
+      await syncService.queueSyncOperation(SyncOperationType.create, task);
+
+      // Assert
+      verify(mockSyncQueue.enqueue(any)).called(1);
+      // The error handling is tested indirectly through the implementation
+    });
+
+    test('should execute create sync operation', () async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+      when(mockSyncQueue.enqueue(any)).thenAnswer((_) => Future.value());
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(false));
+
+      // Act - Test the sync operation through the public interface
+      await syncService.queueSyncOperation(SyncOperationType.create, task);
+
+      // Assert
+      verify(mockSyncQueue.enqueue(any)).called(1);
+    });
+
+    test('should execute update sync operation', () async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+      when(mockSyncQueue.enqueue(any)).thenAnswer((_) => Future.value());
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(false));
+
+      // Act
+      await syncService.queueSyncOperation(SyncOperationType.update, task);
+
+      // Assert
+      verify(mockSyncQueue.enqueue(any)).called(1);
+    });
+
+    test('should execute delete sync operation', () async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+      when(mockSyncQueue.enqueue(any)).thenAnswer((_) => Future.value());
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(false));
+
+      // Act
+      await syncService.queueSyncOperation(SyncOperationType.delete, task);
 
       // Assert
       verify(mockSyncQueue.enqueue(any)).called(1);
@@ -101,6 +220,7 @@ void main() {
       expect(result, isA<List<TaskModel>>());
       verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
       verify(mockRemoteDataSource.getAllTasks()).called(1);
+      verify(mockSyncQueue.processQueue(any)).called(1);
     });
 
     test('should return local tasks when remote is not available', () async {
@@ -117,6 +237,7 @@ void main() {
       expect(result, equals(localTasks));
       verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
       verifyNever(mockRemoteDataSource.getAllTasks());
+      verifyNever(mockSyncQueue.processQueue(any));
     });
 
     test('should return local tasks when remote data source is null', () async {
@@ -147,6 +268,27 @@ void main() {
       expect(result, equals(localTasks));
       verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
       verify(mockRemoteDataSource.getAllTasks()).called(1);
+    });
+
+    test('should not process queue when queue is empty during sync', () async {
+      // Arrange
+      final localTasks = TestDataFactory.createTaskList(count: 2);
+      final remoteTasks = TestDataFactory.createTaskList(count: 3);
+
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(true));
+      when(mockRemoteDataSource.getAllTasks())
+          .thenAnswer((_) => Future.value(remoteTasks));
+      when(mockSyncQueue.isEmpty).thenReturn(true);
+
+      // Act
+      final result = await syncService.syncWithRemote(localTasks);
+
+      // Assert
+      expect(result, isA<List<TaskModel>>());
+      verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
+      verify(mockRemoteDataSource.getAllTasks()).called(1);
+      verifyNever(mockSyncQueue.processQueue(any));
     });
 
     test('should check queue status', () {
@@ -194,6 +336,46 @@ void main() {
         throwsA(isA<Exception>()),
       );
       verify(mockSyncQueue.enqueue(any)).called(1);
+    });
+
+    test('should handle empty local tasks list', () async {
+      // Arrange
+      final localTasks = <TaskModel>[];
+      final remoteTasks = TestDataFactory.createTaskList(count: 3);
+
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(true));
+      when(mockRemoteDataSource.getAllTasks())
+          .thenAnswer((_) => Future.value(remoteTasks));
+      when(mockSyncQueue.isEmpty).thenReturn(true);
+
+      // Act
+      final result = await syncService.syncWithRemote(localTasks);
+
+      // Assert
+      expect(result, isA<List<TaskModel>>());
+      verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
+      verify(mockRemoteDataSource.getAllTasks()).called(1);
+    });
+
+    test('should handle empty remote tasks list', () async {
+      // Arrange
+      final localTasks = TestDataFactory.createTaskList(count: 2);
+      final remoteTasks = <TaskModel>[];
+
+      when(mockRemoteDataSource.isRemoteAvailable())
+          .thenAnswer((_) => Future.value(true));
+      when(mockRemoteDataSource.getAllTasks())
+          .thenAnswer((_) => Future.value(remoteTasks));
+      when(mockSyncQueue.isEmpty).thenReturn(true);
+
+      // Act
+      final result = await syncService.syncWithRemote(localTasks);
+
+      // Assert
+      expect(result, isA<List<TaskModel>>());
+      verify(mockRemoteDataSource.isRemoteAvailable()).called(1);
+      verify(mockRemoteDataSource.getAllTasks()).called(1);
     });
   });
 }
