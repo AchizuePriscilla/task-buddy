@@ -20,8 +20,6 @@ void main() {
 
   setUp(() {
     mockTaskStateNotifier = MockTaskStateNotifier();
-    // Stub the addListener method that Riverpod uses
-  
   });
 
   tearDown(() {
@@ -345,7 +343,8 @@ void main() {
       await tester.pumpWidget(createTestWidget(task));
 
       // Find the checkbox GestureDetector (second one - the first is for the card tap)
-      final checkboxFinder = find.byKey(ValueKey(AppGlobals.taskCardCheckboxKey));
+      final checkboxFinder =
+          find.byKey(ValueKey(AppGlobals.taskCardCheckboxKey));
       await tester.tap(checkboxFinder);
       await tester.pump();
 
@@ -385,7 +384,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap delete button
-      await tester.tap(find.byKey(ValueKey(AppGlobals.alertDialogDeleteButtonKey)));
+      await tester
+          .tap(find.byKey(ValueKey(AppGlobals.alertDialogDeleteButtonKey)));
       await tester.pumpAndSettle();
 
       // Assert
@@ -434,7 +434,6 @@ void main() {
       // Assert
       verifyNever(mockTaskStateNotifier.deleteTask(any));
     });
-
 
     testWidgets(
         'should handle _showDeleteConfirmation dialog with long task titles',
