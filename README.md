@@ -117,7 +117,11 @@ flutter test test/unit/services/
 flutter test test/unit/providers/
 flutter test test/unit/repositories/
 ```
+### Widget Tests
+```bash
+flutter test test/widget/
 
+```
 ### Integration Tests
 ```bash
 # Run integration tests
