@@ -9,6 +9,7 @@ import 'package:task_buddy/features/task_management/presentation/providers/task_
 import 'package:task_buddy/features/task_management/presentation/screens/edit_task_screen.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/due_date_rich_text.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/priority_indicator_chip.dart';
+import 'package:task_buddy/shared/globals.dart';
 import 'package:task_buddy/shared/localization/strings.dart';
 import 'package:task_buddy/shared/theme/text_styles.dart';
 
@@ -85,6 +86,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
               Padding(
                 padding: EdgeInsets.only(top: 8.h, left: 5.w),
                 child: GestureDetector(
+                  key: ValueKey(AppGlobals.taskCardCheckboxKey),
                   onTap: () => _toggleTaskCompletion(),
                   child: Container(
                     decoration: BoxDecoration(
@@ -253,6 +255,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
                   child: Text(AppStrings.cancel),
                 ),
                 TextButton(
+                  key: ValueKey(AppGlobals.alertDialogDeleteButtonKey),
                   onPressed: () => Navigator.of(context).pop(true),
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(context).colorScheme.error,

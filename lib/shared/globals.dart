@@ -5,6 +5,8 @@ class AppGlobals {
 
   //Config Strings
   static const String appThemeStorageKey = 'AppTheme';
+  static const String taskCardCheckboxKey = 'task_card_checkbox';
+  static const String alertDialogDeleteButtonKey = 'alert_dialog_delete_button';
 
   // Animation Durations
   static const Duration shortAnimation = Duration(milliseconds: 200);

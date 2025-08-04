@@ -9,6 +9,8 @@ import 'package:task_buddy/features/task_management/domain/enums/priority_enum.d
 import 'package:task_buddy/features/task_management/domain/models/task_model.dart';
 import 'package:task_buddy/features/task_management/presentation/providers/task_state_provider.dart';
 import 'package:task_buddy/features/task_management/presentation/widgets/task_card.dart';
+import 'package:task_buddy/shared/globals.dart';
+import 'package:task_buddy/shared/localization/strings.dart';
 import '../helpers/test_data_factory.dart';
 import 'task_card_test.mocks.dart';
 
@@ -19,9 +21,7 @@ void main() {
   setUp(() {
     mockTaskStateNotifier = MockTaskStateNotifier();
     // Stub the addListener method that Riverpod uses
-    when(mockTaskStateNotifier.addListener(any,
-            fireImmediately: anyNamed('fireImmediately')))
-        .thenReturn(() {});
+  
   });
 
   tearDown(() {
@@ -110,6 +110,7 @@ void main() {
       expect(find.text('Completed Task'), findsOneWidget);
       expect(find.byIcon(Icons.check), findsOneWidget);
     });
+
     testWidgets('should handle empty description gracefully',
         (WidgetTester tester) async {
       // Arrange
@@ -333,6 +334,148 @@ void main() {
 
       // Assert
       expect(find.byIcon(Icons.schedule), findsNothing);
+    });
+    testWidgets('should call _toggleTaskCompletion when checkbox is tapped',
+        (WidgetTester tester) async {
+      // Arrange
+      final task = TestDataFactory.createTask(isCompleted: false);
+      when(mockTaskStateNotifier.updateTask(any)).thenAnswer((_) async {});
+
+      // Act
+      await tester.pumpWidget(createTestWidget(task));
+
+      // Find the checkbox GestureDetector (second one - the first is for the card tap)
+      final checkboxFinder = find.byKey(ValueKey(AppGlobals.taskCardCheckboxKey));
+      await tester.tap(checkboxFinder);
+      await tester.pump();
+
+      // Assert
+      verify(mockTaskStateNotifier.updateTask(any)).called(1);
+    });
+    testWidgets('should show delete confirmation dialog when swiping to delete',
+        (WidgetTester tester) async {
+      // Arrange
+      final task = TestDataFactory.createTask(title: 'Test Task');
+      when(mockTaskStateNotifier.deleteTask(any)).thenAnswer((_) async {});
+
+      // Act
+      await tester.pumpWidget(createTestWidget(task));
+
+      // Swipe left to trigger delete confirmation
+      await tester.drag(find.byType(Dismissible), const Offset(-800, 0));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.text(AppStrings.cancel), findsOneWidget);
+      expect(find.text(AppStrings.delete), findsWidgets);
+    });
+
+    testWidgets('should call _deleteTask when delete is confirmed in dialog',
+        (WidgetTester tester) async {
+      // Arrange
+      final task = TestDataFactory.createTask(title: 'Test Task');
+      when(mockTaskStateNotifier.deleteTask(any)).thenAnswer((_) async {});
+
+      // Act
+      await tester.pumpWidget(createTestWidget(task));
+
+      // Swipe left to trigger delete confirmation
+      await tester.drag(find.byType(Dismissible), const Offset(-800, 0));
+      await tester.pumpAndSettle();
+
+      // Tap delete button
+      await tester.tap(find.byKey(ValueKey(AppGlobals.alertDialogDeleteButtonKey)));
+      await tester.pumpAndSettle();
+
+      // Assert
+      verify(mockTaskStateNotifier.deleteTask(task)).called(1);
+    });
+
+    testWidgets('should not call _deleteTask when cancel is tapped in dialog',
+        (WidgetTester tester) async {
+      // Arrange
+      final task = TestDataFactory.createTask(title: 'Test Task');
+      when(mockTaskStateNotifier.deleteTask(any)).thenAnswer((_) async {});
+
+      // Act
+      await tester.pumpWidget(createTestWidget(task));
+
+      // Swipe left to trigger delete confirmation
+      await tester.drag(find.byType(Dismissible), const Offset(-800, 0));
+      await tester.pumpAndSettle();
+
+      // Tap cancel button
+      await tester.tap(find.text(AppStrings.cancel));
+      await tester.pumpAndSettle();
+
+      // Assert
+      verifyNever(mockTaskStateNotifier.deleteTask(any));
+    });
+
+    testWidgets(
+        'should handle confirmDismiss callback when dialog is dismissed',
+        (WidgetTester tester) async {
+      // Arrange
+      final task = TestDataFactory.createTask(title: 'Test Task');
+      when(mockTaskStateNotifier.deleteTask(any)).thenAnswer((_) async {});
+
+      // Act
+      await tester.pumpWidget(createTestWidget(task));
+
+      // Swipe left to trigger delete confirmation
+      await tester.drag(find.byType(Dismissible), const Offset(-800, 0));
+      await tester.pumpAndSettle();
+
+      // Dismiss the dialog by tapping outside or pressing back
+      await tester.tapAt(const Offset(100, 100)); // Tap outside dialog
+      await tester.pumpAndSettle();
+
+      // Assert
+      verifyNever(mockTaskStateNotifier.deleteTask(any));
+    });
+
+
+    testWidgets(
+        'should handle _showDeleteConfirmation dialog with long task titles',
+        (WidgetTester tester) async {
+      // Arrange
+      final taskWithLongTitle = TestDataFactory.createTask(
+        title:
+            'This is a very long task title that should be handled properly in the confirmation dialog',
+      );
+      when(mockTaskStateNotifier.deleteTask(any)).thenAnswer((_) async {});
+
+      // Act
+      await tester.pumpWidget(createTestWidget(taskWithLongTitle));
+
+      // Swipe left to trigger delete confirmation
+      await tester.drag(find.byType(Dismissible), const Offset(-800, 0));
+      await tester.pumpAndSettle();
+
+      // Assert
+      expect(find.text(AppStrings.deleteTask), findsOneWidget);
+      expect(
+          find.text(
+              '${AppStrings.deleteTaskConfirmation} "${taskWithLongTitle.title}"?'),
+          findsOneWidget);
+    });
+    testWidgets('should handle _buildDeleteBackground method',
+        (WidgetTester tester) async {
+      // Arrange
+      final task = TestDataFactory.createTask();
+
+      // Act
+      await tester.pumpWidget(createTestWidget(task));
+
+      // Start swiping to trigger the delete background
+      await tester.drag(find.byType(Dismissible), const Offset(-400, 0));
+      await tester.pump();
+
+      // Assert
+      expect(find.byIcon(Icons.delete), findsOneWidget);
+      expect(find.text(AppStrings.delete), findsOneWidget);
+      // This tests the _buildDeleteBackground method
     });
   });
 }
